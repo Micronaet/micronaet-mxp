@@ -53,22 +53,29 @@ class SaleOrder(orm.Model):
     """
     _inherit = 'sale.order'
 
+    # Button event:
+    def go_master_order(self, cr, uid, ids, context=None):
+        ''' Return to master cancel order
+        '''
+        return True
+        
     # --------
     # Utility:
     # --------
-    def create_order_from_line(self, cr, uid, line_proxy, context=None):
+    def create_order_from_line(self, cr, uid, line_proxy, section, 
+            context=None):
         ''' Utility function for create order from line
         '''
         # Pool used:
         line_pool = self.pool.get('sale.order.line')
         
         # Get section:
-        section = 0
-        for line in line_proxy.order_id.order_line:
-            new_section = line.splitted_order_id.section
-            if new_section > section:
-                section = new_section # get max
-        section +=1        
+        #section = 0
+        #for line in line_proxy.order_id.order_line:
+        #    new_section = line.split_order_id.section
+        #    if new_section > section:
+        #        section = new_section # get max
+        #section +=1        
             
         # Create new split order from line_
         parent_header = line_proxy.order_id
@@ -92,11 +99,12 @@ class SaleOrder(orm.Model):
             'incoterm': parent_header.incoterm,
             'user_id': parent_header.user_id.id,
             'section_id': parent_header.section_id.id,
-            'fiscal_position': : parent_header.fiscal_position.id,
+            'fiscal_position': parent_header.fiscal_position.id,
             # categ_ids
-            'payment_term': : parent_header.payment_term.id
+            'payment_term': parent_header.payment_term.id,
 
             'partner_id': parent_header.partner_id.id,
+            'pricelist_id': parent_header.pricelist_id.id,
             'address_id': parent_header.address_id.id,
             'invoice_id': parent_header.invoice_id.id,
             'carrier_id': parent_header.carrier_id.id,
@@ -106,11 +114,32 @@ class SaleOrder(orm.Model):
             
             }, context=context)
             # analysis_ids
+
+        # ---------------
+        # Duplicate line:
+        # ---------------
+        line_pool.create(cr, uid, {
+            'order_id': order_id,
+            'name': line_proxy.name,
+            'product_id': line_proxy.product_id.id,
+            'product_uom_qty': line_proxy.product_uom_qty,
+            'product_uom': line_proxy.product_uom.id,
+            'date_deadline': line_proxy.date_deadline,
+            'price_unit': line_proxy.price_unit,
+            'analysis_required': line_proxy.analysis_required,
+            #'tax_id'            
+            }, context=context)    
             
+        # -------------------
         # Update parent line:    
+        # -------------------
         line_pool.write(cr, uid, line_proxy.id, {
             'split_order_id': order_id
             }, context=context) 
+            
+        # -----------------
+        # WF: Confirm order
+        # -----------------
         wf_service = netsvc.LocalService('workflow')
         wf_service.trg_validate(uid, 'sale.order', order_id, 'order_confirm', cr)
 
@@ -125,18 +154,27 @@ class SaleOrder(orm.Model):
         ''' Not confirmed the order just cancel and create suborders
         '''
         section = 0
-        for line in self.browse(cr, uid, ids, context=context)[0].order_line:
+        lines = self.browse(cr, uid, ids, context=context)[0].order_line
+        if len(lines) == 1:
+            return super(SaleOrder, self).action_button_confirm(
+                cr, uid, ids, context=context)
+                                
+        for line in lines:
             # -----------------------
             # Create order from line:
             # -----------------------
-            section = 1
-            self.create_order_from_line(cr, uid, line, context=context)
+            section += 1
+            self.create_order_from_line(cr, uid, line, section, context=context)
         
+        self.write(cr, uid, ids, {
+            'is_master': True,
+            }, context=context)
         # Cancel order (now there's child confirmed)
-        wf_service = netsvc.LocalService('workflow')
-        wf_service.trg_validate(uid, 'sale.order', ids[0], 'cancel', cr)
+        #wf_service = netsvc.LocalService('workflow')
+        #wf_service.trg_validate(uid, 'sale.order', ids[0], 'cancel', cr)
     
     _columns = {
+        'section': fields.integer('Section'), 
         'master_id': fields.many2one('sale.order.line', 'Master'),
         'master_section': fields.integer('Section'), 
         'is_splitted': fields.boolean('Is splitted'),

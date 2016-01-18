@@ -1,7 +1,26 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-
+        <record model="ir.ui.view" id="view_sale_order_splitted_form">
+            <field name="name">sale.order.splittedform</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                   <field name="section" invisible="1"/>
+                   <field name="is_splitted" invisible="1"/>
+                   <button name="go_master_order" string="Master order" type="object" attrs="{'invisible':[('is_splitted','=',False)]}"/>
+                </field>
+                <!--<field name="order_line" position="attributes">
+                    <attribute name="attrs">{'invisible':[(is_splitted','=',True)]}</attribute>
+                </field>-->
+                <!--<field name="order_line" position="after">
+                    <field name="splitted_line_ids" />
+                </field>price_subtotal-->
+                
+                
+            </field>            
+        </record>
     </data>
 </openerp>
 
