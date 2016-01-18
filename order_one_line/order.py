@@ -56,7 +56,7 @@ class SaleOrderLine(orm.Model):
         section += 1
         
         item_id = self.pool.get('sale.order').create_order_from_line(
-            cr, uid, line, section, context=context)
+            cr, uid, line_proxy, section, context=context)
             
         return {
             'type': 'ir.actions.act_window',
@@ -124,20 +124,12 @@ class SaleOrder(orm.Model):
         # Pool used:
         line_pool = self.pool.get('sale.order.line')
         
-        # Get section:
-        #section = 0
-        #for line in line_proxy.order_id.order_line:
-        #    new_section = line.split_order_id.section
-        #    if new_section > section:
-        #        section = new_section # get max
-        #section +=1        
-            
         # Create new split order from line_
         parent_header = line_proxy.order_id
         order_id = self.create(cr, uid, {
             # Manage field:
             'is_splitted': True,     
-            'master_id': line_proxy.order_id.id,       
+            'master_id': parent_header.id,       
             'section': section,
             
             # Order field to copy:
