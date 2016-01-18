@@ -43,7 +43,50 @@ class SaleOrderLine(orm.Model):
     """
     
     _inherit = 'sale.order.line'
-    
+
+    def create_splitted_order(self, cr, uid, ids, context=None):
+        # get section
+        line_proxy = self.browse(
+            cr, uid, ids, context=context)[0]
+        section = 0    
+        for line in line_proxy.order_id.order_line:        
+            res = line.split_order_id.section
+            if type(res) == int and res > section:
+                section = res
+        section += 1
+        
+        item_id = self.pool.get('sale.order').create_order_from_line(
+            cr, uid, line, section, context=context)
+            
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Split order',
+            'res_model': 'sale.order',
+            'res_id': item_id,
+            'view_type': 'form',
+            'view_mode': 'form',
+            #'view_id': view_id,
+            #'target': 'new',
+            #'nodestroy': True,
+            #'context': {'active_ids': active_ids}
+            }
+            
+    def open_splitted_order(self, cr, uid, ids, context=None):
+        item_id = self.browse(
+            cr, uid, ids, context=context)[0].split_order_id.id
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Master order',
+            'res_model': 'sale.order',
+            'res_id': item_id,
+            'view_type': 'form',
+            'view_mode': 'form',
+            #'view_id': view_id,
+            #'target': 'new',
+            #'nodestroy': True,
+            #'context': {'active_ids': active_ids}
+            }
+        
     _columns = {
         'split_order_id': fields.many2one('sale.order', 'Split order'),
         }
@@ -57,7 +100,19 @@ class SaleOrder(orm.Model):
     def go_master_order(self, cr, uid, ids, context=None):
         ''' Return to master cancel order
         '''
-        return True
+        item_id = self.browse(cr, uid, ids, context=context)[0].master_id.id
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Master order',
+            'res_model': 'sale.order',
+            'res_id': item_id,
+            'view_type': 'form',
+            'view_mode': 'form',
+            #'view_id': view_id,
+            #'target': 'new',
+            #'nodestroy': True,
+            #'context': {'active_ids': active_ids}
+            }
         
     # --------
     # Utility:
@@ -96,7 +151,7 @@ class SaleOrder(orm.Model):
             'transport': parent_header.transport,
             'package': parent_header.package,
             'delivery_note': parent_header.delivery_note,
-            'incoterm': parent_header.incoterm,
+            'incoterm': parent_header.incoterm.id,
             'user_id': parent_header.user_id.id,
             'section_id': parent_header.section_id.id,
             'fiscal_position': parent_header.fiscal_position.id,
@@ -145,7 +200,7 @@ class SaleOrder(orm.Model):
 
         # TODO write is_master?
         # TODO cancel orer when last (here)!!!!    
-        return True
+        return order_id
         
     # ------------------------
     # Override confirm button:    
@@ -158,13 +213,16 @@ class SaleOrder(orm.Model):
         if len(lines) == 1:
             return super(SaleOrder, self).action_button_confirm(
                 cr, uid, ids, context=context)
-                                
+                          
+        active_ids = []                        
         for line in lines:
             # -----------------------
             # Create order from line:
             # -----------------------
             section += 1
-            self.create_order_from_line(cr, uid, line, section, context=context)
+            active_ids.append(
+                self.create_order_from_line(
+                    cr, uid, line, section, context=context))
         
         self.write(cr, uid, ids, {
             'is_master': True,
@@ -172,6 +230,20 @@ class SaleOrder(orm.Model):
         # Cancel order (now there's child confirmed)
         #wf_service = netsvc.LocalService('workflow')
         #wf_service.trg_validate(uid, 'sale.order', ids[0], 'cancel', cr)
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Splitted order',
+            'res_model': 'sale.order',
+            'res_id': active_ids,
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            #'view_id': view_id,
+            #'target': 'new',
+            #'nodestroy': True,
+            #'context': {'active_ids': active_ids}
+            }
+
     
     _columns = {
         'section': fields.integer('Section'), 

@@ -9,7 +9,7 @@
                 <field name="name" position="after">
                    <field name="section" invisible="1"/>
                    <field name="is_splitted" invisible="1"/>
-                   <button name="go_master_order" string="Master order" type="object" attrs="{'invisible':[('is_splitted','=',False)]}"/>
+                   <button name="go_master_order" string="Master order" type="object" icon="gtk-go-up" attrs="{'invisible':[('is_splitted','=',False)]}"/>
                 </field>
                 <!--<field name="order_line" position="attributes">
                     <attribute name="attrs">{'invisible':[(is_splitted','=',True)]}</attribute>
@@ -18,6 +18,16 @@
                     <field name="splitted_line_ids" />
                 </field>price_subtotal-->
                 
+                <!--sale.order.line-->
+                <!--<xpath expr="/form/sheet/notebook/page//field[@name='order_line']" position="attributes">
+                    <attribute name="context">{'default_date_deadline': date_deadline, 'partner_id': partner_id}</attribute>
+                <xpath expr="/form/sheet/notebook/page//field[@name='order_line']/form//field[@name='price_subtotal']" position="after">
+                </xpath>-->
+                <xpath expr="/form/sheet/notebook/page//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
+                    <field name="split_order_id" readonly="1" />
+                    <button name="create_splitted_order" string="Create new order" type="object" icon="gtk-execute" attrs="{'invisible': [('split_order_id','!=',False)]}"/>
+                    <button name="open_splitted_order" string="Splitt orer" type="object" icon="gtk-go-forward" attrs="{'invisible': [('split_order_id','=',False)]}"/>
+                </xpath>                
                 
             </field>            
         </record>
