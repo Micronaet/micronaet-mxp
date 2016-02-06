@@ -124,6 +124,9 @@ class SaleOrder(orm.Model):
         # Pool used:
         line_pool = self.pool.get('sale.order.line')
         
+        if line_proxy.split_order_id:
+            return line_proxy.split_order_id.id # jet present
+        
         # Create new split order from line_
         parent_header = line_proxy.order_id
         order_id = self.create(cr, uid, {
@@ -133,10 +136,9 @@ class SaleOrder(orm.Model):
             'section': section,
             
             # Order field to copy:
-            'name': '%s-%s' % (parent_header.name, section),
+            #'name': '%s-%s' % (parent_header.name, section),
             'date_order': parent_header.date_order,
             'deadline_order': parent_header.deadline_order,
-            #'date_valid': parent_header.date_valid, # mx_sale
             'validity': parent_header.validity,
             'client_order_ref': parent_header.client_order_ref,
             'note': parent_header.note,
@@ -156,8 +158,9 @@ class SaleOrder(orm.Model):
             'invoice_id': parent_header.invoice_id.id,
             'carrier_id': parent_header.carrier_id.id,
             
-            # Present?
+            #'date_valid': parent_header.date_valid, # mx_sale
             #'quotation_mode': parent_header.quotation_mode,
+            # Present?
             
             }, context=context)
             # analysis_ids

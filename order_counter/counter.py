@@ -51,10 +51,9 @@ class SaleOrder(orm.Model):
     """    
     _inherit = 'sale.order'
 
-    def action_button_confirm(self, cr, uid, ids, context=None):
-        res = super(SaleOrder, self).action_button_confirm(
+    def action_wait(self, cr, uid, ids, context=None):
+        res = super(SaleOrder, self).action_wait(
             cr, uid, ids, context=context)
-        
         self.write(cr, uid, ids, {
             'order_counter': self.pool.get('ir.sequence').get(
             cr, uid, 'sale.order.confirmed') or '/',
