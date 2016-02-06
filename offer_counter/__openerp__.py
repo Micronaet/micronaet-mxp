@@ -35,6 +35,7 @@
     'demo': [],
     'data': [
         #'security/ir.model.access.csv',    
+        'order_sequence.xml'
         'counter_view.xml',
         ],
     'active': False,

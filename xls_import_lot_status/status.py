@@ -26,7 +26,7 @@ import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from openerp import SUPERUSER_ID, api
+from openerp import SUPERUSER_ID#, api
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
@@ -122,7 +122,7 @@ class StockProductionLot(orm.Model):
                 if not start and row[0].value == header_row:                    
                     start = True
                     parameter = 0
-                    for col in range(1, 50)
+                    for col in range(1, 50):
                         if row[col - 1].value == code_lot:
                             code_id = col - 1
                             parameter += 1
@@ -173,7 +173,7 @@ class StockProductionLot(orm.Model):
                     'xls_qty': qty,
                     }, context=context)
                 _logger.info('Update product %s - lot %s with %s' % (
-                    code, lot, qty)
+                    code, lot, qty))
             except:
                 error += _('%s. Error import: <b>%s [%s]</b>[%s]</br>') % (
                     i, code, lot, sys.exc_info())
@@ -194,7 +194,7 @@ class StockProductionLot(orm.Model):
         
     
     _columns = {
-        'xls_qty': fields.float('Lot qty', digits=(16, 3))), 
-    }
+        'xls_qty': fields.float('Lot qty', digits=(16, 3)), 
+        }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

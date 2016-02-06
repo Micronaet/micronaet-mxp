@@ -30,12 +30,14 @@
     'depends': [
         'base',
         'base_log',
+        'stock',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
         #'security/ir.model.access.csv',    
         'status_view.xml',
+        'scheduler.xml',
         ],
     'active': False,
     'installable': True,

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!-- Chemical Analysis sequence: -->
+        <record model="ir.sequence.type" id="seq_chemical_analysis_number">
+                <field name="name">Chemical Analysis</field>
+                <field name="code">chemical.analysis</field>
+
+        </record>
+        <record model="ir.sequence" id="seq_chemical_analysis">
+                <field name="name">Chemical analysis seq.</field>
+                <field name="code">chemical.analysis</field>
+                <field name="padding" eval="5" />
+                <field name="prefix">AC</field>
+        </record>
+    </data>
+</openerp>
+
