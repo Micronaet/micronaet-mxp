@@ -122,7 +122,6 @@ class StockProductionLot(orm.Model):
             
             try:
                 if not start and row[0].value == header_row:                    
-                    import pdb; pdb.set_trace()
                     start = True
                     parameter = 0
                     for col in range(1, 50):
@@ -155,6 +154,12 @@ class StockProductionLot(orm.Model):
                     continue
                 
                 # TODO manage error?
+                if not (
+                        row[code_id].value and row[lot_id].value):
+                    _logger.warning('%s. Jump line' % i)    
+                    error += _('%s. Line without all element')
+                    continue
+                        
                 code = '%08d' % row[code_id].value
                 lot = '%d' % row[lot_id].value
                 qty = row[qty_id].value                
