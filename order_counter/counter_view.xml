@@ -11,6 +11,27 @@
             </field>
         </field>
     </record>
+    <record model="ir.ui.view" id="view_sale_view_order_counter_tree">
+        <field name="name">sale.order.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="order_counter" />
+            </field>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_sale_view_order_counter_search">
+        <field name="name">sale.order.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="order_counter" />
+            </field>
+        </field>
+    </record>
+
 
     </data>
 </openerp>
