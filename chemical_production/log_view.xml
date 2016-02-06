@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    <!--stock.picking.in-->
+    <!--<record model="ir.ui.view" id="view_picking_in_form_with_lot">
+        <field name="name">Stock pickin in lot</field>
+        <field name="model">stock.pickin.in</field>
+        <field name="inherit_id" ref="stock.view_picking_in_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//move_lines/tree/field[@name='product_qty']" position="after">
+                <field name="prod_lot" string="Lot" />
+            </xpath>
+        </field>
+    </record>-->
+
+    <!--stock.production.lot-->
+    
+    <record model="ir.ui.view" id="view_stock_production_lot_coal_form">
+        <field name="name">stock.production.lot.coal</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
+        <field name="arch" type="xml">
+            <field name="stock_available" position="after">                
+                <field name="stock_available_chemical"/>
+            </field>
+            <field name="stock_available" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <!--<xpath expr="//notebook/page[@string='Revisions']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>-->
+            <xpath expr="//notebook/page[@string='Revisions']" position="replace" />
+
+            <field name="move_ids" position="replace">
+                <separator string="+ Load / - Unload movements:" colspan="4"/>
+                <field name="move_ids" domain="[('state','in',('confirmed','done'))]" readonly="1">
+                    <tree string="Load and Unload">
+                        <field name="origin" string="Document" />
+                        <field name="date" />
+                        <field name="product_qty" sum="total" />
+                        <field name="product_uom" />
+                        <field name="via_number" />
+                        <field name="state" /> <!--invisible="1"-->
+                    </tree>
+                </field>
+            </field>    
+
+            <field name="move_ids" position="after">
+                <separator string="Production: + end product (blue=not validated)" colspan="4"/>
+                <field name="production_end_product_ids" colspan="4" readonly="1" domain="[('chemical_state','in',['confirmed','validated']),('coal_production','=',True)]">
+                    <tree string="End product:" colors="blue:chemical_state=='validated'">
+	                    <field name="name" string="Document" context="{'calendar_view_ref':'chemical_production.mrp_production_calendar_view_extra_coal','form_view_ref':'chemical_production.view_mrp_production_not_coal_form_view'}"/>
+	                    <field name="date_planned" />
+	                    <field name="product_qty" sum="total" />
+	                    <field name="product_uom" />
+	                    <field name="state" invisible="1" />
+	                    <field name="production_note" />
+	                    <field name="chemical_state" /> <!--invisible="1"-->
+                    </tree>
+                </field>    
+                <separator string="Production: - materials (blue=not validated)" colspan="4"/>
+                <field name="production_material_ids" colspan="4" readonly="1" domain="[('chemical_state','in',['confirmed','validated']),('coal_production','=',True)]">
+                    <tree string="Materials:" colors="blue:chemical_state=='validated'">
+                        <field name="mrp_production_id" string="Document" context="{'calendar_view_ref':'chemical_production.mrp_production_calendar_view_extra_coal','form_view_ref':'chemical_production.view_mrp_production_not_coal_form_view'}"/>
+	                    <field name="date_planned" />
+                        <field name="quantity" sum="total"/>
+                        <field name="uom_id" />
+	                    <field name="material_note" />
+	                    <field name="chemical_state" /> <!--invisible="1"-->
+                    </tree>
+                </field>
+            </field>
+        </field>
+    </record>    
+    
+    <record model="ir.ui.view" id="view_production_lot_chemical_tree">
+            <field name="name">stock.production.lot.tree</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+            <field name="arch" type="xml">            
+                <field name="stock_available" position="after">
+                    <field name="stock_available_chemical" />
+                </field>
+                <field name="stock_available" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>                
+            </field>
+        </record>
+    <!--<record model="ir.ui.view" id="search_product_lot_filter_chemical_production">
+        <field name="name">Production Lots chemical</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter" />
+        <field name="arch" type="xml">
+            <field name="name" string="Product Lots" position="after">
+                <field name="product_id" string="Product name" filter_domain="['|',('name','ilike',self),('default_code','ilike',self)]" />
+            </field>
+        </field>
+    </record>-->
+        
+    </data>
+</openerp>

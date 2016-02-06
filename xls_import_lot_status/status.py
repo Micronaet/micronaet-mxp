@@ -113,8 +113,7 @@ class StockProductionLot(orm.Model):
         start = False
         
         error = ''
-        import pdb; pdb.set_trace()
-        for i in range(min_line0, max_line):
+        for i in range(min_line, max_line):
             try:
                 row = ws.row(i)                
             except:
@@ -123,21 +122,25 @@ class StockProductionLot(orm.Model):
             
             try:
                 if not start and row[0].value == header_row:                    
+                    import pdb; pdb.set_trace()
                     start = True
                     parameter = 0
                     for col in range(1, 50):
-                        if row[col - 1].value == code_lot:
-                            code_id = col - 1
-                            parameter += 1
-                            continue
-                        elif row[col - 1].value == lot_lot:
-                            lot_id = col - 1
-                            parameter += 1
-                            continue
-                        elif row[col - 1].value == qty_lot:
-                            qty_id = col - 1
-                            parameter += 1
-                            continue
+                        try:
+                            if row[col].value == code_col:
+                                code_id = col
+                                parameter += 1
+                                continue
+                            elif row[col].value == lot_col:
+                                lot_id = col
+                                parameter += 1
+                                continue
+                            elif row[col].value == qty_col:
+                                qty_id = col
+                                parameter += 1
+                                continue
+                        except:
+                            break # out of range        
                     if parameter != parameters:
                         return log_error(log_pool, log_id, 
                             '''Write a line before data with: 
@@ -151,8 +154,9 @@ class StockProductionLot(orm.Model):
                 if not start: # Jump all line till start
                     continue
                 
-                code = row[code_id].value
-                lot = row[lot_id].value
+                # TODO manage error?
+                code = '%08d' % row[code_id].value
+                lot = '%d' % row[lot_id].value
                 qty = row[qty_id].value                
                 #        if type(f) not in (float, int) :
                 #            f = float(f.replace(',', '.'))
@@ -163,6 +167,8 @@ class StockProductionLot(orm.Model):
                 if not product_ids:
                     error += 'Product code not found: <b>%s</b>' % code
                     continue
+                if len(product_ids) > 1:
+                    error += '%s. Double product: <b>%s</b>' % (i, code)                        
                     
                 # Search product lot:
                 lot_ids = lot_pool.search(cr, uid, [

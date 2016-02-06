@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Workflow: -->
+        <record model="workflow" id="wkf_production_chemical">
+            <field name="name">mrp.production.chemical.wkf</field>
+            <field name="osv">mrp.production</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- Activity: -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_production_chemical" />
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">production_chemical_draft()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_confirmed">
+            <field name="wkf_id" ref="wkf_production_chemical" />
+            <field name="name">confirmed</field>
+            <field name="kind">function</field>
+            <field name="action">production_chemical_confirmed()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_validated">
+            <field name="wkf_id" ref="wkf_production_chemical" />
+            <field name="name">validated</field>
+            <field name="kind">function</field>
+            <field name="action">production_chemical_validated()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_production_chemical" />
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">production_chemical_cancel()</field>
+        </record>
+
+        <!-- Trigger: -->
+        <record model="workflow.transition" id="t1">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_confirmed" />
+            <field name="signal">trigger_chemical_confirm</field>
+        </record>
+
+        <record model="workflow.transition" id="t2">
+            <field name="act_from" ref="act_confirmed" />
+            <field name="act_to" ref="act_validated" />
+            <field name="signal">trigger_chemical_validate</field>
+        </record>
+
+        <record model="workflow.transition" id="t3a">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_cancel" />
+            <field name="signal">trigger_chemical_cancel_a</field>
+        </record>
+        
+        <record model="workflow.transition" id="t3b">
+            <field name="act_from" ref="act_confirmed" />
+            <field name="act_to" ref="act_cancel" />
+            <field name="signal">trigger_chemical_cancel_b</field>
+        </record>
+
+        <record model="workflow.transition" id="t3c">
+            <field name="act_from" ref="act_validated" />
+            <field name="act_to" ref="act_cancel" />
+            <field name="signal">trigger_chemical_cancel_c</field>
+        </record>
+
+        <record model="workflow.transition" id="t4">
+            <field name="act_from" ref="act_cancel" />
+            <field name="act_to" ref="act_draft" />
+            <field name="signal">trigger_chemical_draft</field>
+        </record>
+    </data>
+</openerp>

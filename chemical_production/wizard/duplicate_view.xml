@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!--mrp.production.duplicate.wizard-->
+    <record model="ir.ui.view" id="mrp_production_duplicate_wizard_view">
+        <field name="name">Duplicate production</field>
+        <field name="model">mrp.production.duplicate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Wizard: Duplicate production">
+                 <field name="quantity" />
+                 <field name="uom_id" readonly="1" />
+
+                 <field name="date_planned" />
+                 <field name="workcenter_id" />
+                 
+                 <field name="from_bom" />
+                 
+                 <button type="object" name="button_duplicate_action" string="Duplicate" />
+                 <button  icon="gtk-cancel" special="cancel" string="Cancel" />
+            </form>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="action_mrp_production_duplicate_wizard">
+        <field name="name">Duplicare production</field>
+        <field name="res_model">mrp.production.duplicate.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" eval="mrp_production_duplicate_wizard_view" />
+        <!--<field name="context">{'default_quantity':'chemical_production.mrp_production_calendar_view_extra_coal','form_view_ref':'chemical_production.view_mrp_production_not_coal_form_view','search_default_state_confirmed':True,'default_coal_production':False}</field>-->
+    </record>
+
+</data>
+</openerp>
+

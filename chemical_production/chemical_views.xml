@@ -1,0 +1,345 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!--mrp.bom-->    
+    <!--<record model="ir.ui.view" id="view_mrp_bom_chemcial_tree">
+        <field name="name">mrp.bom.chemical</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="/tree" position="attributes">
+                <attribute name="colors">colors="blue:method;green:only_coal"</attribute>
+                <attribute name="string">BOM (green = only for coal)</attribute>
+            </xpath>
+        </field>
+    </record>    -->
+    
+    <record model="ir.ui.view" id="view_mrp_bom_filter_coal_split">
+        <field name="name">mrp.bom.chemical.coal</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.view_mrp_bom_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="/search/group" position="after">
+                <filter name="only_coal_yes" string="Coal BOM" domain="[('only_coal','=',True)]" />
+                <filter name="only_coal_no" string="Not coal BOM" domain="[('only_coal','=',False)]" />
+            </xpath>
+            <xpath expr="/search/group/filter[1]" position="after">
+                 <filter string="Type coal" icon="terp-go-month" domain="[]" context="{'group_by':'only_coal'}" help="Split into 2 types of BOM, coal and not coal"/>
+            </xpath>
+        </field>
+    </record>        
+    <record model="ir.ui.view" id="view_mrp_bom_chemcial_2_tree">
+        <field name="name">mrp.bom.chemical</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_component_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after"> 
+                <field name="only_coal" invisible="1" />
+            </field>
+            <xpath expr="/tree" position="attributes">
+                <attribute name="colors">blue:method;green:only_coal</attribute>
+                <attribute name="string">BOM (green = only for coal)</attribute>
+            </xpath>
+        </field>
+    </record>    
+    
+    <!--product.product-->
+    <record model="ir.ui.view" id="view_product_product_lot_situation_form">
+        <field name="name">product.product.form.situation</field>
+        <field name="model">product.product</field>
+        <field name="priority" eval="50"/>
+        <field name="arch" type="xml">
+            <form string="Product situation">
+                <group col="4" colspan="4">
+                    <field name="name" />
+                    <field name="default_code" />
+                    <separator string="Accounting status:" colspan="4" />
+                    <field name="sql_net" />
+                    <field name="sql_availability_net" />
+                    <field name="sql_availability_gross" />
+                    <separator string="Lots:" colspan="4" />
+                    <field name="lot_ids" colspan="4" nolabel="1">
+                       <field name="name"/>
+                       <field name="date"/>
+                       <field name="stock_available_chemical"/>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_product_product_lot_situation">
+        <field name="name">Situation product</field>
+        <field name="res_model">product.product</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_product_product_lot_situation_form"/>
+    </record>
+    
+    <!--sale.order-->  
+    <record model="ir.ui.view" id="view_sale_order_situation_form">
+        <field name="name">sale.order.form.situation</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='product_id']" position="attributes">
+               <attribute name="context">{'form_view_ref':'chemical_production.view_product_product_lot_situation_form','partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'shop':parent.shop_id, 'uom':product_uom}</attribute>
+               <!--<button type="action" name="%(action_product_product_lot_situation)d" string="Info" context="{'search_default_product_id':product_id'}"/>-->
+           </xpath>
+        </field>
+    </record>
+
+    <!--mrp.production.material-->
+    <record model="ir.ui.view" id="view_mrp_production_material_search_no_coal_view">
+        <field name="name">Search material no coal</field>
+        <field name="model">mrp.production.material</field>
+        <field name="arch" type="xml">
+            <search string="Material search no coal">
+                    <field name="product_id" string="Product" filter_domain="[('product_id','=',self)]"/>
+                    <field name="prodlot_id" string="Lot" filter_domain="[('prodlot_id','=',self)]" />
+                    <field name="product_package" string="Lot" filter_domain="[('product_package','=',self)]" />
+
+                    <separator string="Chemical state"/>
+                    <filter name="state_draft" string="Draft" domain="[('chemical_state','=','draft')]"/>
+                    <filter name="state_confirmed" string="Confirmed" domain="[('chemical_state','=','confirmed')]"/>
+                    <filter name="state_validated" string="Validated" domain="[('chemical_state','=','validated')]"/>
+                    <filter name="state_cancel" string="Cancel" domain="[('chemical_state','=','cancel')]"/>
+
+                    <group expand="1" string="Group By...">
+                        <filter name="group_product" string="Product" icon="terp-accessories-archiver" context="{'group_by':'product_id'}"/>
+                        <filter name="group_prodlot_id" string="Lot" icon="terp-accessories-archiver" context="{'group_by':'prodlot_id'}"/>
+                    </group>                    
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_mrp_production_material_tree_no_coal_view">
+        <field name="name">Production material list</field>
+        <field name="model">mrp.production.material</field>
+        <field name="arch" type="xml">
+            <tree string="Manufacturing line no coal" colors="red:prodlot_id == False">
+	            <field name="mrp_production_id" />
+	            <field name="product_id"/>
+	            <field name="prodlot_id" />
+	            <field name="product_package" />
+	            <field name="quantity" />
+	            <field name="uom_id" />
+	            <field name="chemical_state" />
+                <field name="coal_production" invisible="1" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_mrp_production_material_form_no_coal_view">
+        <field name="name">Production material list</field>
+        <field name="model">mrp.production.material</field>
+        <field name="arch" type="xml">
+            <form string="Manufacturing line no coal" version="7.0">
+               <group readonly="1" colspan="4" col="4">
+	                <field name="mrp_production_id" context="{'calendar_view_ref':'chemical_production.mrp_production_calendar_view_extra_coal','form_view_ref':'chemical_production.view_mrp_production_not_coal_form_view','search_default_state_confirmed':True,'default_coal_production':False}"/>
+	                <field name="product_id"/>
+	                <field name="prodlot_id" />
+                    <field name="product_package" domain="[('product_id','=',product_id)]" context="{'default_product_id':product_id}"/>
+	                <field name="quantity" />
+	                <field name="uom_id" />
+	                <field name="chemical_state" />
+	                <field name="coal_production" invisible="1" />
+	            </group>    
+            </form>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="action_view_mrp_production_material_not_coal">
+        <field name="name">Production line not coal</field>
+        <field name="res_model">mrp.production.material</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_state_confirmed':True,'search_default_group_product':True}</field>
+    </record>
+        
+    <!--mrp.production-->
+    <record model="ir.ui.view" id="view_mrp_production_search_no_coal_view">
+        <field name="name">Search production no coal</field>
+        <field name="model">mrp.production</field>
+        <field name="arch" type="xml">
+            <search string="Production search no coal">
+                    <field name="product_id" string="Product" filter_domain="[('product_id','=',self)]"/>
+                    <field name="workcenter_id" string="Workcenter" filter_domain="[('workcenter_id','=',self)]"/>
+                    <field name="prodlot_id" string="Lot" filter_domain="[('prodlot_id','=',self)]" />
+
+                    <separator string="Chemical state"/>
+                    <filter name="state_draft" string="Draft" domain="[('chemical_state','=','draft')]"/>
+                    <filter name="state_confirmed" string="Confirmed" domain="[('chemical_state','=','confirmed')]"/>
+                    <filter name="state_validated" string="Validated" domain="[('chemical_state','=','validated')]"/>
+                    <filter name="state_cancel" string="Cancel" domain="[('chemical_state','=','cancel')]"/>
+
+                    <group expand="1" string="Group By...">
+                        <filter name="group_workcenter" string="Workcenter" icon="terp-partner" context="{'group_by':'workcenter_id'}"/>
+                        <filter name="group_product" string="Product" icon="terp-accessories-archiver" context="{'group_by':'product_id'}"/>
+                        <filter name="group_date" string="Date planned" context="{'group_by':'date_planned'}"/>
+                    </group>                    
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_mrp_production_tree_no_coal_view">
+        <field name="name">Production no coal list</field>
+        <field name="model">mrp.production</field>
+        <field name="arch" type="xml">
+            <tree colors="blue:state in ('draft',);gray:chemical_state in ('cancel',);black:state in ('validated',)" string="Manufacturing no coal">
+	            <field name="name" />
+	            <field name="date_planned" />
+	            <field name="product_id"/>
+	            <field name="prodlot_id" />
+	            <field name="product_qty" />
+	            <field name="product_uom" />
+
+                <button name="trigger_chemical_confirm" string="Confirm production" class="oe_highlight" attrs="{'invisible': [('chemical_state','not in',['draft'])]}"  icon="gtk-go-forward"/>
+                <button name="trigger_chemical_cancel_a" string="Cancel"  attrs="{'invisible': [('chemical_state','not in',['draft'])]}" icon="gtk-cancel" />
+                <button name="trigger_chemical_validate" string="Validate production" class="oe_highlight" attrs="{'invisible': [('chemical_state','not in',['confirmed'])]}" icon="gtk-apply" />
+                <button name="trigger_chemical_cancel_b" string="Cancel"  attrs="{'invisible': [('chemical_state','not in',['confirmed'])]}" icon="gtk-cancel" />
+                <button name="trigger_chemical_cancel_c" string="Cancel"  attrs="{'invisible': [('chemical_state','not in',['validated'])]}" icon="gtk-cancel" />
+                <button name="trigger_chemical_draft" string="Return draft" class="oe_highlight"  attrs="{'invisible': [('chemical_state','not in',['cancel'])]}" icon="gtk-go-back"/>
+	            <field name="chemical_state" />
+	            <field name="state" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="mrp_production_calendar_view_extra_coal">
+        <field name="name">Production extra coal</field>
+        <field name="model">mrp.production</field>
+        <field name="arch" type="xml">
+            <calendar color="workcenter_id" date_start="date_planned" string="Lavorazioni" mode="week">
+	            <field name="product_id" />
+	            <field name="product_qty" />
+	            <field name="product_uom" />
+	            <field name="prodlot_id" />
+            </calendar>
+        </field>
+    </record>    
+
+    <record model="ir.ui.view" id="view_mrp_production_not_coal_form_view">
+        <field name="name">Production form</field>
+        <field name="model">mrp.production</field>
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <form string="Production order" version="7.0">
+                <header>
+                    <button name="trigger_chemical_confirm" string="Confirm production" class="oe_highlight" attrs="{'invisible': [('chemical_state','not in',['draft'])]}" />
+                    <button name="trigger_chemical_cancel_a" string="Cancel"  attrs="{'invisible': [('chemical_state','not in',['draft'])]}" />
+
+                    <button name="trigger_chemical_validate" string="Validate production" class="oe_highlight" attrs="{'invisible': [('chemical_state','not in',['confirmed'])]}" />
+                    <button name="trigger_chemical_cancel_b" string="Cancel"  attrs="{'invisible': [('chemical_state','not in',['confirmed'])]}" />
+
+                    <button name="trigger_chemical_cancel_c" string="Cancel"  attrs="{'invisible': [('chemical_state','not in',['validated'])]}" />
+
+                    <button name="trigger_chemical_draft" string="Return draft" class="oe_highlight"  attrs="{'invisible': [('chemical_state','not in',['cancel'])]}"/>
+
+                    <field name="chemical_state" widget="statusbar" statusbar_visible="draft,confirmed,validated,cancel" readonly="1" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Production order
+                            <field name="name" class="oe_inline" attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])],'required': True}"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="product_id" on_change="product_id_change_no_coal(product_id)" domain="[('bom_ids','!=',False),('bom_ids.bom_id','=',False)]" class="oe_inline" context="{'default_supply_method':'produce','default_type':'product'}" attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])], 'required': True}"/>
+                            <label for="product_qty" />
+                            <div>
+                                <field name="product_qty" class="oe_inline" attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])], 'required': True}"/>
+                                <field name="product_uom" class="oe_inline" attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])], 'required': True}"/>
+                                <field name="coal_production" invisible="1" />
+                            </div>
+                            <field name="prodlot_id" attrs="{'invisible':[('product_id','=',False)]}" context="{'default_product_id':product_id}"/>
+                            <field name="product_package" domain="[('product_id','=',product_id)]" context="{'default_product_id':product_id}"/>
+	                        <field name="date_planned" attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])], 'required': True}"/>
+                            <field name="workcenter_id" />
+                        </group>
+                        <group>
+                            <field name="bom_id" domain="[('product_id','=',product_id),('bom_id','=',False),('only_coal','=',False)]" 
+                                   context="{'default_product_id':product_id,'default_only_coal':False}" 
+                                   on_change="bom_id_change(bom_id)" required="1" 
+                                   attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])], 'required': True}"/>
+                            <field name="linked_to_coal" invisible="1" />
+                            <field name="coal_production_id" readonly="1" attrs="{'invisible':[('linked_to_coal','=',False)]}" />
+                            <field name="user_id" />
+                            <button name="load_materials_from_bom" string="Load material" type="object" attrs="{'invisible':[('chemical_state','in',['validated','cancel'])]}"/>
+                            <button name="%(action_mrp_production_duplicate_wizard)d" type="action" string="Duplicate production" class="oe_highlight" context="{'default_quantity':product_qty,'default_uom_id':product_uom,'default_workcenter_id':workcenter_id}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Used product">
+                            <group>
+                                <group string="Material:">
+                                    <field name="bom_material_ids" nolabel="1" attrs="{'readonly': [('chemical_state', 'not in', ['draft','confirmed'])]}">
+                                        <tree string="Materials:" editable="bottom">
+                                            <field name="product_id" />
+                                            <field name="prodlot_id" domain="[('product_id','=',product_id)]" context="{'default_product_id':product_id}"/>
+                                            <field name="product_package" domain="[('product_id','=',product_id)]" context="{'default_product_id':product_id}"/>	                
+                                            <field name="quantity" sum="total" />
+                                            <field name="uom_id" />
+                                            <field name="material_note" />
+                                            <field name="mrp_production_id" invisible="1"/>
+                                        </tree>
+                                        <form string="Materials:">
+                                            <field name="product_id" />
+                                            <field name="prodlot_id" domain="[('product_id','=',product_id)]" context="{'default_product_id':product_id}"/>
+                                            <field name="product_package" domain="[('product_id','=',product_id)]" context="{'default_product_id':product_id}"/>
+                                            <field name="quantity" />
+                                            <field name="uom_id" />
+                                            <field name="mrp_production_id" invisible="1"/>
+                                        </form>
+                                    </field>
+                                    <field name="state" invisible="1" />
+                                    <field name="coal_production" invisible="1" />
+                                </group>
+                            </group>
+                        </page> 
+                        
+                        <!--options="{'reload_on_button': True}"<page string="Informazioni Aggiuntive" invisible="1">
+                            <group>
+                                <group>
+                                    <field name="priority" attrs="{'readonly': [['chemical_state', 'not in', ['confirmed', 'draft']]]}"/>
+                                    <field name="date_start" invisible="1" attrs="{'invisible': True, 'readonly': True}"/>
+                                    <field name="date_finished" invisible="1" attrs="{'invisible': True, 'readonly': True}"/>
+                                </group>
+                                <group>
+                                    <field name="company_id" widget="selection" invisible="1" attrs="{'invisible': True,'required': True}"/>
+                                    <field name="sale_ref" attrs="{'readonly': True}"/>
+                                    <field name="sale_name" attrs="{'readonly': True}"/>
+                                    <field name="picking_id" attrs="{'readonly': True}"/>
+                                    <field name="move_prod_id" invisible="1" attrs="{'invisible': True,'readonly': True}"/>
+                                </group>
+                            </group>
+                        </page>-->                        
+                    </notebook>
+                    <separator string="Production note" colspan="4"/>
+                    <field name="production_note" colspan="4" nolabel="1" />
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>    
+    
+    <record model="ir.actions.act_window" id="action_view_mrp_production_not_coal">
+        <field name="name">Production not coal</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="view_id" eval="view_mrp_production_tree_no_coal_view" />
+        <field name="search_view_id" eval="view_mrp_production_search_no_coal_view" />
+        <field name="domain">[('coal_production','=',False)]</field>
+        <field name="context">{'calendar_view_ref':'chemical_production.mrp_production_calendar_view_extra_coal','form_view_ref':'chemical_production.view_mrp_production_not_coal_form_view','search_default_state_confirmed':True,'default_coal_production':False}</field>
+    </record>
+
+    <menuitem name = "Manufacturing extra coal" parent = "mrp.menu_mrp_manufacturing" id = "menu_mrp_manufacturing_not_coal" sequence = "10" />
+        <menuitem name = "Manufacturing order" parent = "menu_mrp_manufacturing_not_coal" id = "menu_mrp_manufacturing_not_coal_to_close" action = "action_view_mrp_production_not_coal" sequence = "10" />
+        <menuitem name = "Material list" parent = "menu_mrp_manufacturing_not_coal" id = "menu_mrp_material_not_coal_to_close" action = "action_view_mrp_production_material_not_coal" sequence = "20" />
+</data>
+</openerp>
+

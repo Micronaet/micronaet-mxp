@@ -1,0 +1,382 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* chemical_production
+# <> <>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 7.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-02-19 21:23+0000\n"
+"PO-Revision-Date: 2014-02-19 22:28+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+"X-Generator: Gtranslator 2.91.5\n"
+
+#. module: chemical_production
+#: view:stock.production.lot:0
+msgid "Production: - materials (blue=not validated)"
+msgstr "Produzioni: - materie prime (blu= non convalidate)"
+
+#. module: chemical_production
+#: view:mrp.production:0 selection:mrp.production,chemical_state:0
+#: view:mrp.production.material:0
+#: selection:mrp.production.material,chemical_state:0
+msgid "Confirmed"
+msgstr "Confermata"
+
+#. module: chemical_production
+#: field:mrp.bom,imported:0
+msgid "Imported"
+msgstr "Importato"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Return draft"
+msgstr "Riattiva"
+
+#. module: chemical_production
+#: field:product.product,lot_ids:0
+msgid "Lots"
+msgstr "Lotti"
+
+#. module: chemical_production
+#: model:ir.model,name:chemical_production.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Ordine di Produzione"
+
+#. module: chemical_production
+#: field:mrp.production,bom_material_ids:0
+msgid "Material lines"
+msgstr "Righe materiale"
+
+#. module: chemical_production
+#: help:mrp.production.duplicate.wizard,quantity:0
+msgid "Quantity fo new production"
+msgstr "Quantità per nuova produzione"
+
+#. module: chemical_production
+#: field:mrp.production.material,material_note:0
+msgid "Note"
+msgstr "Note"
+
+#. module: chemical_production
+#: view:mrp.production:0 view:mrp.production.material:0
+msgid "Group By..."
+msgstr "Raggruppa per..."
+
+#. module: chemical_production
+#: view:mrp.production.duplicate.wizard:0
+msgid "Duplicate"
+msgstr "Duplica"
+
+#. module: chemical_production
+#: view:mrp.production:0 selection:mrp.production,chemical_state:0
+#: view:mrp.production.material:0
+#: selection:mrp.production.material,chemical_state:0
+msgid "Draft"
+msgstr "Bozza"
+
+#. module: chemical_production
+#: view:mrp.production:0 view:mrp.production.material:0
+msgid "Lot"
+msgstr "Lotto"
+
+#. module: chemical_production
+#: view:product.product:0
+msgid "Lots:"
+msgstr "Lotti:"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Material:"
+msgstr "Materiale:"
+
+#. module: chemical_production
+#: view:stock.production.lot:0
+msgid "Document"
+msgstr "Documento"
+
+#. module: chemical_production
+#: view:product.product:0
+msgid "Product situation"
+msgstr "Situazione prodotti"
+
+#. module: chemical_production
+#: field:mrp.production.duplicate.wizard,uom_id:0
+#: field:mrp.production.material,uom_id:0
+msgid "UOM"
+msgstr "U.M."
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Production note"
+msgstr "Note produzione"
+
+#. module: chemical_production
+#: view:mrp.production:0 field:mrp.production,chemical_state:0
+#: view:mrp.production.material:0
+#: field:mrp.production.material,chemical_state:0
+msgid "Chemical state"
+msgstr "Stato"
+
+#. module: chemical_production
+#: model:ir.model,name:chemical_production.model_product_product
+#: view:mrp.production:0 view:mrp.production.material:0
+#: field:mrp.production.material,product_id:0
+msgid "Product"
+msgstr "Prodotto"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Lavorazioni"
+msgstr "Lavorazioni"
+
+#. module: chemical_production
+#: model:ir.actions.act_window,name:chemical_production.action_product_product_lot_situation
+msgid "Situation product"
+msgstr "Situazione prodotto"
+
+#. module: chemical_production
+#: view:sale.order:0
+msgid ""
+"{'form_view_ref':'chemical_production."
+"view_product_product_lot_situation_form','partner_id':parent.partner_id, "
+"'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'shop':parent."
+"shop_id, 'uom':product_uom}"
+msgstr ""
+"{'form_view_ref':'chemical_production."
+"view_product_product_lot_situation_form','partner_id':parent.partner_id, "
+"'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'shop':parent."
+"shop_id, 'uom':product_uom}"
+
+#. module: chemical_production
+#: field:stock.production.lot,stock_available_chemical:0
+msgid "Stock available"
+msgstr "Disponibile a magazzino"
+
+#. module: chemical_production
+#: view:mrp.production:0 view:stock.production.lot:0
+msgid "total"
+msgstr "totale"
+
+#. module: chemical_production
+#: model:ir.ui.menu,name:chemical_production.menu_mrp_manufacturing_not_coal_to_close
+msgid "Manufacturing order"
+msgstr "Ordini di produzione"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Validate production"
+msgstr "Convalida produzione"
+
+#. module: chemical_production
+#: model:ir.actions.act_window,name:chemical_production.action_view_mrp_production_not_coal
+msgid "Production not coal"
+msgstr "Produzioni (extra carb.)"
+
+#. module: chemical_production
+#: view:mrp.production.duplicate.wizard:0
+msgid "Wizard: Duplicate production"
+msgstr "Wizard: Duplica produzione"
+
+#. module: chemical_production
+#: model:ir.model,name:chemical_production.model_stock_production_lot
+msgid "Serial Number"
+msgstr "Numero di serie"
+
+#. module: chemical_production
+#: model:ir.ui.menu,name:chemical_production.menu_mrp_manufacturing_not_coal
+msgid "Manufacturing extra coal"
+msgstr "Produzione (extra carb.)"
+
+#. module: chemical_production
+#: view:mrp.bom:0
+msgid "blue:method;green:only_coal"
+msgstr "blue:method;green:only_coal"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Manufacturing no coal"
+msgstr "Produzione (extra carb.)"
+
+#. module: chemical_production
+#: view:stock.production.lot:0
+msgid "Load and Unload"
+msgstr "Carico e Scarico"
+
+#. module: chemical_production
+#: model:ir.ui.menu,name:chemical_production.menu_mrp_material_not_coal_to_close
+msgid "Material list"
+msgstr "Lista materiali"
+
+#. module: chemical_production
+#: view:mrp.production:0 view:stock.production.lot:0
+msgid "Materials:"
+msgstr "Materiali:"
+
+#. module: chemical_production
+#: model:ir.actions.act_window,name:chemical_production.action_view_mrp_production_material_not_coal
+msgid "Production line not coal"
+msgstr "Righe produzione (extra carb.)"
+
+#. module: chemical_production
+#: view:product.product:0
+msgid "Accounting status:"
+msgstr "Stato contabilità:"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Production search no coal"
+msgstr "Ricerca produzione (extra carb.)"
+
+#. module: chemical_production
+#: field:mrp.production,coal_production:0
+msgid "Coal production"
+msgstr "Produzione carbone"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Confirm production"
+msgstr "Conferma produzione"
+
+#. module: chemical_production
+#: view:mrp.production:0 field:mrp.production,workcenter_id:0
+#: field:mrp.production.duplicate.wizard,workcenter_id:0
+msgid "Workcenter"
+msgstr "Linea di produzione"
+
+#. module: chemical_production
+#: model:ir.model,name:chemical_production.model_mrp_production_material
+msgid "Production used material"
+msgstr "Materiali utilizzati"
+
+#. module: chemical_production
+#: view:mrp.production.material:0
+msgid "Manufacturing line no coal"
+msgstr "Produzione (extra carb.)"
+
+#. module: chemical_production
+#: model:ir.model,name:chemical_production.model_mrp_bom
+msgid "Bill of Material"
+msgstr "Distinta Base"
+
+#. module: chemical_production
+#: view:stock.production.lot:0
+msgid "Production: + end product (blue=not validated)"
+msgstr "Produzione: + prodotto finito (blu = non convalidato)"
+
+#. module: chemical_production
+#: model:ir.model,name:chemical_production.model_mrp_production_duplicate_wizard
+msgid "Duplicate production wizard"
+msgstr "Wizard duplica produzione"
+
+#. module: chemical_production
+#: help:mrp.production.duplicate.wizard,uom_id:0
+msgid "Defaulf UOM"
+msgstr "U.M. di default"
+
+#. module: chemical_production
+#: view:stock.production.lot:0
+msgid "+ Load / - Unload movements:"
+msgstr "Movimenti di Carico (+) / Scarico (-):"
+
+#. module: chemical_production
+#: model:ir.actions.act_window,name:chemical_production.action_mrp_production_duplicate_wizard
+msgid "Duplicare production"
+msgstr "Duplica produzione"
+
+#. module: chemical_production
+#: field:mrp.production.duplicate.wizard,quantity:0
+#: field:mrp.production.material,quantity:0
+msgid "Quantity"
+msgstr "Quantità"
+
+#. module: chemical_production
+#: view:mrp.production:0 field:mrp.production.material,mrp_production_id:0
+msgid "Production order"
+msgstr "Ordine di produzione"
+
+#. module: chemical_production
+#: view:mrp.production:0 selection:mrp.production,chemical_state:0
+#: view:mrp.production.material:0
+#: selection:mrp.production.material,chemical_state:0
+msgid "Validated"
+msgstr "Convalidata"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Used product"
+msgstr "Prodotti usati"
+
+#. module: chemical_production
+#: field:mrp.production.material,prodlot_id:0
+msgid "Material lot"
+msgstr "Lotto materiale"
+
+#. module: chemical_production
+#: field:stock.production.lot,production_material_ids:0
+msgid "Production material"
+msgstr "Produzione: materie prime"
+
+#. module: chemical_production
+#: view:stock.production.lot:0
+msgid "End product:"
+msgstr "Prodotto finito:"
+
+#. module: chemical_production
+#: field:mrp.production,production_note:0
+msgid "Production Note"
+msgstr "Note produzione"
+
+#. module: chemical_production
+#: field:stock.production.lot,production_end_product_ids:0
+msgid "Production end product"
+msgstr "Produzione: prodotto finitpo"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Load material"
+msgstr "Carica materie"
+
+#. module: chemical_production
+#: view:mrp.bom:0
+msgid "BOM (green = only for coal)"
+msgstr "Distinta base (verde = per registro carbone)"
+
+#. module: chemical_production
+#: field:mrp.production,linked_to_coal:0
+msgid "Linked to coal production"
+msgstr "Collegato a produzione di carbone"
+
+#. module: chemical_production
+#: view:mrp.production:0 selection:mrp.production,chemical_state:0
+#: view:mrp.production.duplicate.wizard:0 view:mrp.production.material:0
+#: selection:mrp.production.material,chemical_state:0
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: chemical_production
+#: view:mrp.production:0
+msgid "Duplicate production"
+msgstr "Duplica produzione"
+
+#. module: chemical_production
+#: view:mrp.production:0 field:mrp.production.duplicate.wizard,date_planned:0
+#: field:mrp.production.material,date_planned:0
+msgid "Date planned"
+msgstr "Data pianificata"
+
+#. module: chemical_production
+#: field:mrp.production,prodlot_id:0
+msgid "Product lot"
+msgstr "Lotto prodotto"
+
+#. module: chemical_production
+#: view:mrp.production.material:0
+msgid "Material search no coal"
+msgstr "Ricerca materiale (extra carbone)"
