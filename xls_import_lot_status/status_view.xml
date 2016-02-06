@@ -10,7 +10,7 @@
                     <attribute name="colors">red:xls_qty&lt;=0</attribute>
                 </xpath>
                 <field name="stock_available" position="after">
-                    <field name="xls_qty" />
+                    <field name="xls_qty" sum="Total"/>
                 </field>
                 <field name="stock_available" position="attributes">
                     <attribute name="invisible">1</attribute>
