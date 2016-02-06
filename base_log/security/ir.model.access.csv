@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_log_importation_user,log.importation,model_log_importation,base.group_user,1,1,1,1
+access_log_importation_mode_user,log.importation.mode,model_log_importation_mode,base.group_user,1,1,1,1
+
