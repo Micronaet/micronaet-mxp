@@ -147,7 +147,7 @@ class StockProductionLot(orm.Model):
                                Code col: 'code'
                                Lot col: 'lot'
                                Quantity col: 'qty'
-                               (you could also hide it!
+                               (you could also hide it!<br/>
                             ''')
                     continue # next line
                 if not start: # Jump all line till start
@@ -157,7 +157,7 @@ class StockProductionLot(orm.Model):
                 if not (
                         row[code_id].value and row[lot_id].value):
                     _logger.warning('%s. Jump line' % i)    
-                    error += _('%s. Line without all element')
+                    error += _('%s. Warning Line without all element<br/>' % i)
                     continue
                         
                 code = '%08d' % row[code_id].value
@@ -170,26 +170,28 @@ class StockProductionLot(orm.Model):
                 product_ids = product_pool.search(cr, uid, [
                     ('default_code', '=', code)], context=context)
                 if not product_ids:
-                    error += 'Product code not found: <b>%s</b>' % code
+                    error += '%s. Product code not found: <b>%s</b><br/>' % (
+                        i, code)
                     continue
                 if len(product_ids) > 1:
-                    error += '%s. Double product: <b>%s</b>' % (i, code)                        
+                    error += '%s. Double product: <b>%s</b><br/>' % (i, code)                        
                     
                 # Search product lot:
                 lot_ids = lot_pool.search(cr, uid, [
                     ('name', '=', lot)], context=context)
                 if not lot_ids:
-                    error += 'Product lot code not found: <b>%s</b>' % lot
+                    error += '%s. Product lot code not found:<b>%s</b><br/>' % (
+                        i, lot)
                     continue
                 # TODO check also product-lot compliant!!!    
 
                 lot_pool.write(cr, uid, lot_ids[0], {
                     'xls_qty': qty,
                     }, context=context)
-                _logger.info('Update product %s - lot %s with %s' % (
-                    code, lot, qty))
+                _logger.info('%s. Update product %s - lot %s with %s' % (
+                    i, code, lot, qty))
             except:
-                error += _('%s. Error import: <b>%s [%s]</b>[%s]</br>') % (
+                error += _('%s. Error import: <b>%s [%s]</b>[%s]</br><br/>') % (
                     i, code, lot, sys.exc_info())
 
         # Update lof with extra information:    
