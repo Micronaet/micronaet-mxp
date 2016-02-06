@@ -1,0 +1,262 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* chemical_analysis_quotation
+# <> <>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 7.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-02-09 10:33+0000\n"
+"PO-Revision-Date: 2014-02-09 11:36+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+"X-Generator: Gtranslator 2.91.5\n"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,specific_text:0
+msgid "Add specific text of product"
+msgstr "Aggiunge testo specifica del prodotto"
+
+#. module: chemical_analysis_quotation
+#: code:addons/chemical_analysis_quotation/quotation.py:210
+#, python-format
+msgid "*** Element not present"
+msgstr "*** Elemento non presente"
+
+#. module: chemical_analysis_quotation
+#: code:addons/chemical_analysis_quotation/quotation.py:147
+#: code:addons/chemical_analysis_quotation/quotation.py:152
+#: code:addons/chemical_analysis_quotation/quotation.py:157
+#, python-format
+msgid " *** Out of range!"
+msgstr " *** Fuori range!"
+
+#. module: chemical_analysis_quotation
+#: view:sale.order:0
+msgid "blue:analysis_required"
+msgstr "blue:analysis_required"
+
+#. module: chemical_analysis_quotation
+#: selection:sale.order.line.analysis,version:0
+msgid "Supplier"
+msgstr "Fornitore"
+
+#. module: chemical_analysis_quotation
+#: selection:sale.order.line.analysis,version:0
+msgid "Internal"
+msgstr "Interna"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,lot_id:0
+msgid "Lot"
+msgstr "Lotto"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line,analysis_required:0
+msgid "Anal. req."
+msgstr "Rich. anal."
+
+#. module: chemical_analysis_quotation
+#: view:sale.order:0 view:sale.order.line.analysis:0
+msgid "Quotation analysis"
+msgstr "Offerta con Analisi"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,only_chemical:0
+msgid "Only chemical"
+msgstr "Solo simbolo chimico"
+
+#. module: chemical_analysis_quotation
+#: model:ir.model,name:chemical_analysis_quotation.model_sale_order_line_analysis
+msgid "Chemical element"
+msgstr "Elemento chimico"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,product_id:0
+msgid "Product"
+msgstr "Prodotto"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,analysis_id:0
+msgid "Analysis sheet"
+msgstr "Documento analisi"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,line_id:0
+msgid "Quotation line linked to this analysys"
+msgstr "Riga offerta collegata ad un'analisi"
+
+#. module: chemical_analysis_quotation
+#: view:res.users:0
+msgid "Offer"
+msgstr "Offerta"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,standard_analysis:0
+msgid "Don't take analysis values, only model element indication"
+msgstr ""
+"Non prende i valori presenti nell'analisi solamente le indicazioni e gli "
+"elementi del modello"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order,show_analysis:0
+msgid "Show analysis"
+msgstr "Mostra analisi (stampa)"
+
+#. module: chemical_analysis_quotation
+#: field:res.users,offer_ccn_id:0
+msgid "Offer CCN user"
+msgstr "Utente CCN offerta"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,version:0
+msgid "Choose which one of the analysis use on quotation"
+msgstr "Scegliere quale analisi utilizzare nell'offerta"
+
+#. module: chemical_analysis_quotation
+#: view:sale.order:0
+msgid "Specifics text"
+msgstr "Testo specifica"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,sequence:0
+msgid "Seq."
+msgstr "Seq."
+
+#. module: chemical_analysis_quotation
+#: model:ir.model,name:chemical_analysis_quotation.model_res_users
+msgid "Users"
+msgstr "Utenti"
+
+#. module: chemical_analysis_quotation
+#: code:addons/chemical_analysis_quotation/quotation.py:211
+#, python-format
+msgid "%s: from %s%s to %s%s %s\n"
+msgstr "%s: da %s%s a %s%s %s\n"
+
+#. module: chemical_analysis_quotation
+#: code:addons/chemical_analysis_quotation/quotation.py:208
+#, python-format
+msgid "*** Out of range"
+msgstr "*** Fuori range"
+
+#. module: chemical_analysis_quotation
+#: view:sale.order:0
+msgid "Load lines"
+msgstr "Carica analisi"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,specific_text:0
+msgid "Specific"
+msgstr "Specifica"
+
+#. module: chemical_analysis_quotation
+#: selection:sale.order.line.analysis,version:0
+msgid "Laboratory 3"
+msgstr "Laboratorio 3"
+
+#. module: chemical_analysis_quotation
+#: view:sale.order:0 field:sale.order,analysis_ids:0
+#: field:sale.order.line.analysis,analysis_text:0
+msgid "Analysis"
+msgstr "Analisi"
+
+#. module: chemical_analysis_quotation
+#: selection:sale.order.line.analysis,version:0
+msgid "Laboratory 1"
+msgstr "Laboratorio 1"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,analysis_text:0
+msgid "Get text and values from analysis but let user change some elements"
+msgstr ""
+"Ricava il testo e valori dall'analisi lasciando però all'utente la "
+"possibilità di rettificare alcuni elementi"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,line_id:0
+msgid "Order line"
+msgstr "Riga ordine"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,order_id:0
+msgid "Order"
+msgstr "Ordine"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,only_chemical:0
+msgid "Only chemical symbol in analysis text"
+msgstr "Solo il simbolo chimico nel testo di analisi"
+
+#. module: chemical_analysis_quotation
+#: view:sale.order:0 view:sale.order.line.analysis:0
+msgid "Analysis text (Rows with: Element | Value)"
+msgstr "Testo analisi (riga con \"Elemento : Valore\")"
+
+#. module: chemical_analysis_quotation
+#: code:addons/chemical_analysis_quotation/quotation.py:159
+#, python-format
+msgid " *** Element not present!"
+msgstr " *** Elemento non presente!"
+
+#. module: chemical_analysis_quotation
+#: code:addons/chemical_analysis_quotation/quotation.py:131
+#: code:addons/chemical_analysis_quotation/quotation.py:196
+#, python-format
+msgid "Analysis dated: %s (vers. %s)\n"
+msgstr "Analysis del: %s (vers. %s)\n"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line,analysis_required:0
+msgid "If checked the analysis is printed in the quotation"
+msgstr "Se spuntato l'analisi è stampata nell'offerta"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order,show_analysis:0
+msgid "Show analysis page in offer report"
+msgstr "Mostra la pagina contenente le analisi nella stampa offerta"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,lot_id:0
+msgid "Lot selected for this quotation"
+msgstr "Lotto selezionato per questa offerta"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,version:0
+msgid "Version"
+msgstr "Versione"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,analysis_id:0
+msgid "Analysis selected for print in quotation"
+msgstr "Analisi selezionata per essere stampata nell'offerta"
+
+#. module: chemical_analysis_quotation
+#: help:sale.order.line.analysis,sequence:0
+msgid "Order of the line"
+msgstr "Ordinamento delle righe"
+
+#. module: chemical_analysis_quotation
+#: field:sale.order.line.analysis,standard_analysis:0
+msgid "Standard analysis"
+msgstr "Analisi standard"
+
+#. module: chemical_analysis_quotation
+#: model:ir.model,name:chemical_analysis_quotation.model_sale_order
+msgid "Sales Order"
+msgstr "Ordine di vendita"
+
+#. module: chemical_analysis_quotation
+#: model:ir.model,name:chemical_analysis_quotation.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Linea d'ordine di vendita"
+
+#. module: chemical_analysis_quotation
+#: selection:sale.order.line.analysis,version:0
+msgid "Laboratory 2"
+msgstr "Laboratorio 2"
