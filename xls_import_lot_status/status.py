@@ -21,6 +21,7 @@ import os
 import sys
 import logging
 import openerp
+import xlrd
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
@@ -46,16 +47,17 @@ class StockProductionLot(orm.Model):
     # -------------------------------------------------------------------------
     # SCHEDULE PROCEDURE:
     # -------------------------------------------------------------------------
-    def schedule_update_product_lot_status(self, cr, uid, ids, context=None):
+    def schedule_update_product_lot_status(self, cr, uid, filename, filepath, 
+            context=None):
         ''' Import inventory from scheduled
             file name in context:
                 filepath: home param compliant
                 filename: xls filename
         '''
-        def log_error(log_pool, res_id, error):
+        def log_error(log_pool, log_id, error):
             ''' Write error in log element:
             '''
-            return log_pool.write(cr, uid, res_id, {
+            return log_pool.write(cr, uid, log_id, {
                 'error': error
                 }, context=context)
             
@@ -72,15 +74,15 @@ class StockProductionLot(orm.Model):
 
         # Create import log for this import:
         log_id = log_pool.create(cr, uid, {
-            'name': wiz_proxy.comment or 'No comment',
+            'name': 'Import Inventory: %s' % datetime.now(),
             'error': '',
             # Extra info write at the end
             }, context=context)
 
-        filename = context.get('filename', False)
-        filepath = context.get('filepath', False)
+        #filename = context.get('filename', False)
+        #filepath = context.get('filepath', False)
         if not (filepath and filename):
-            return log_error(log_pool, res_id, 
+            return log_error(log_pool, log_id, 
                 'No filename or filepath set up un context!!')
         
         fullname = os.path.join(os.path.expanduser(filepath), filename)
@@ -91,11 +93,11 @@ class StockProductionLot(orm.Model):
             wb = xlrd.open_workbook(fullname)
             ws = wb.sheet_by_index(0)
         except:
-            return log_error(log_pool, res_id, 
+            return log_error(log_pool, log_id, 
                 'Error opening XLS file!')
 
         annotation = ''
-        from_line -= 1 # Start from 0 (different from line number)
+        min_line = 0 # Start from 0 (different from line number)
         max_line = 30000
         # Parameter for import (written in row before data:
         header_row = '****'
@@ -111,7 +113,8 @@ class StockProductionLot(orm.Model):
         start = False
         
         error = ''
-        for i in range(0, max_line):
+        import pdb; pdb.set_trace()
+        for i in range(min_line0, max_line):
             try:
                 row = ws.row(i)                
             except:
@@ -136,7 +139,7 @@ class StockProductionLot(orm.Model):
                             parameter += 1
                             continue
                     if parameter != parameters:
-                        return log_error(log_pool, res_id, 
+                        return log_error(log_pool, log_id, 
                             '''Write a line before data with: 
                                First col: ****
                                Code col: 'code'

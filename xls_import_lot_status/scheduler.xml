@@ -11,7 +11,7 @@
 			<field eval="5" name="priority"/>
 			<field eval="0" name="doall"/>
 			<field eval="1" name="active"/>
-			<field name="args">({'filename':'inventario.xls','filepath':'~/etl/company/inventario'})</field>
+			<field name="args">('inventario.xls','~/etl/company/inventario')</field>
 			<field eval="1" name="interval_number"/>
 			<field eval="&quot;&quot;&quot;stock.production.lot&quot;&quot;&quot;" name="model"/>
 		</record>
