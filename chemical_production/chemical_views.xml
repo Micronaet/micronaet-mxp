@@ -54,14 +54,14 @@
                     <field name="name" />
                     <field name="default_code" />
                     <separator string="Accounting status:" colspan="4" />
-                    <field name="sql_net" />
+                    <!--<field name="sql_net" />
                     <field name="sql_availability_net" />
-                    <field name="sql_availability_gross" />
+                    <field name="sql_availability_gross" />-->
                     <separator string="Lots:" colspan="4" />
                     <field name="lot_ids" colspan="4" nolabel="1">
                        <field name="name"/>
                        <field name="date"/>
-                       <field name="stock_available_chemical"/>
+                       <!--<field name="stock_available_chemical"/>-->
                     </field>
                 </group>
             </form>
