@@ -26,7 +26,7 @@ import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from openerp import SUPERUSER_ID, api
+from openerp import SUPERUSER_ID#, api
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
@@ -47,5 +47,19 @@ class ProductProduct(orm.Model):
     _columns = {
         'hot_product': fields.boolean('Hot product'),
         }
+
+class SaleOrder(orm.Model):
+    """ Model name: Order
+    """
+    
+    _inherit = 'sale.order'
+    
+    _columns = {
+        'only_hot': fields.boolean('Only hot'),
+        }
+        
+    _defaults = {
+        'only_hot': lambda *x: True 
+        }    
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
