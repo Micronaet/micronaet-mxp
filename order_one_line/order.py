@@ -136,7 +136,7 @@ class SaleOrder(orm.Model):
             'name': '%s-%s' % (parent_header.name, section),
             'date_order': parent_header.date_order,
             'deadline_order': parent_header.deadline_order,
-            'date_valid': parent_header.date_valid,
+            #'date_valid': parent_header.date_valid, # mx_sale
             'validity': parent_header.validity,
             'client_order_ref': parent_header.client_order_ref,
             'note': parent_header.note,
@@ -157,7 +157,7 @@ class SaleOrder(orm.Model):
             'carrier_id': parent_header.carrier_id.id,
             
             # Present?
-            'quotation_mode': parent_header.quotation_mode,
+            #'quotation_mode': parent_header.quotation_mode,
             
             }, context=context)
             # analysis_ids

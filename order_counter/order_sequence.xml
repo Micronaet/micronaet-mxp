@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record model="ir.sequence.type" id="seq_sale_order_confirmed_seq">
+                <field name="name">Order confirmed</field>
+                <field name="code">sale.order.confirmed</field>
+        </record>
+        <record model="ir.sequence" id="seq_sale_order_confirmed">
+                <field name="name">Sale order seq.</field>
+                <field name="code">sale.order.confirmed</field>
+                <field name="padding" eval="5" />
+                <field name="prefix">OC/</field>
+        </record>
+    </data>
+</openerp>
+
