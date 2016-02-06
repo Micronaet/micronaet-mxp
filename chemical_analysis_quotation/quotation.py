@@ -233,6 +233,8 @@ class sale_order_line_analysis(osv.osv):
         'order_id': fields.many2one('sale.order', 'Order', required=True, readonly = False), 
         'product_id': fields.related('line_id', 'product_id', type='many2one', relation='product.product', string='Product', store = True),
         'lot_id': fields.many2one('stock.production.lot', 'Lot', required=False, readonly=False, help="Lot selected for this quotation"),
+        'xls_qty': fields.related('lot_id', 'xls_qty', type='float', string='Q. disp', digit=(16,3),store=False),
+        
         'analysis_id': fields.many2one('chemical.analysis', 'Analysis sheet', required=False, readonly=False, help = 'Analysis selected for print in quotation',),
         'version': fields.selection([
             ('percentage_supplier', 'Supplier'), 
