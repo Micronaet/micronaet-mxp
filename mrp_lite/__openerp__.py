@@ -18,22 +18,26 @@
 ###############################################################################
 
 {
-    'name': '',
+    'name': 'MRP lite version',
     'version': '0.1',
-    'category': '',
+    'category': 'MRP',
     'description': '''        
+        Add list of material as a different object
         ''',
     'author': 'Micronaet S.r.l. - Nicola Riolini',
     'website': 'http://www.micronaet.it',
     'license': 'AGPL-3',
     'depends': [
         'base',
+        'mrp',
+        'product',
+        'stock',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
-        #'security/ir.model.access.csv',    
-        #'_view.xml',
+        'security/ir.model.access.csv',    
+        'lite_view.xml',
         ],
     'active': False,
     'installable': True,

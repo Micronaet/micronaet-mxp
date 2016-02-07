@@ -1,16 +1,107 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>
-        <record model="ir.ui.view" id="view_mrp_lite_form">
-            <field name="name">mrp.production.form</field>
-            <field name="model">mrp.production</field>
-            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
-            <field name="arch" type="xml">
-                <field name="move_lines" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </field>
+    <data>        
+    <!--mrp.production.unload-->
+    <record model="ir.ui.view" id="view_mrp_production_unload_tree">
+        <field name="name">Production unload</field>
+        <field name="model">mrp.production.unload</field>
+        <field name="arch" type="xml">
+            <tree string="unload for production">
+               <field name='product_id'/>
+               <field name='lot_id'/>
+               <field name='quantity' sum="total"/>
+               <field name='uom_id'/>
+           </tree>
+        </field>
+    </record>    
+    <record model="ir.ui.view" id="view_mrp_production_unload_form">
+        <field name="name">Production unload</field>
+        <field name="model">mrp.production.unload</field>
+        <field name="arch" type="xml">
+            <form string="unload for production" version="7.0">
+               <sheet>
+                   <group colspan="4" col="4">
+                       <field name='product_id' readonly="True" />
+                       <field name='lot_id' readonly="True" />
+                       <field name='quantity' readonly="True"/>
+                       <field name='uom_id'/>
+                   </group>    
+               </sheet>    
+           </form>
+        </field>
+    </record>    
+    <record model="ir.ui.view" id="view_mrp_production_unload_search">
+        <field name="name">Production unload</field>
+        <field name="model">mrp.production.unload</field>
+        <field name="arch" type="xml">
+            <search string="unload for production">
+                <field name="product_id" string="Product" filter_domain="[('product_id','=',self)]"/>
+                <field name="lot_id" string="Lot" filter_domain="[('product_id','=',self)]"/>
+                <field name="mrp_production_id" string="Production" filter_domain="[('mrp_production_id','=',self)]"/> 
+                <group expand="1" string="Group By...">
+                    <filter name="group_mrp" string="Lavoration" icon="terp-partner" context="{'group_by':'mrp_production_id'}"/>
+                    <filter name="group_product" string="Product" icon="terp-accessories-archiver" context="{'group_by':'product_id'}"/>
+                    <filter name="group_lot" string="Lot" icon="terp-accessories-archiver" context="{'group_by':'lot_id'}"/>
+                </group>                    
+           </search>
+        </field>
+    </record>            
+    
+    <record model="ir.ui.view" id="default_mrp_production_form_view">
+        <field name="name">Production default</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view" />
+        <field name="arch" type="xml">
+            <!-- New header -->
+            <xpath expr="/form/header" position="replace">
+                <header>
+                    <!--<button name="trigger_accounting_cancel_a" type="workflow" string="Cancel" attrs="{'invisible':[('accounting_state','not in',('production',))],}" />
+                    <button name="trigger_accounting_cancel_b" type="workflow" string="Cancel" attrs="{'invisible':[('accounting_state','not in',('close',))],}"  />
+                    <button name="trigger_accounting_production" type="workflow" class="oe_highlight" string="In produzione" attrs="{'invisible':[('accounting_state','not in',('draft',))],}"/>
+                    <button name="trigger_accounting_close" type="workflow" class="oe_highlight" string="Close" attrs="{'invisible':[('accounting_state','not in',('production',))],}" />
+                    <button name="trigger_accounting_draft" type="workflow" class="oe_highlight" string="Restart" attrs="{'invisible':[('accounting_state','not in',('cancel',))],}" />
+
+                    <button name="dummy_refresh" type="object" icon="gtk-refresh" string="Refresh" attrs="{'invisible':[('accounting_state','in',('cancel','close'))],}" />
+		            <field name="accounting_state" widget="statusbar" statusbar_visible="draft,production,close,cancel" />-->
+		            <field name="state" invisible="1" />
+	            </header>       
+            </xpath>          
+            <field name="product_id" position="after">
+                <field name="lot_id" domain="[('product_id','=',product_id)]"/>
             </field>
-        </record>
+            <!--Hide notebook -->
+            <xpath expr="/form/sheet/notebook" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide origin-->
+            <field name="origin" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <!--TODO add only_for_coal filter for bom_id-->
+            
+            <!--New notebook -->
+            <xpath expr="/form/sheet/notebook" position="after">
+                <notebook>
+			        <page string="Prodotti Utilizzati">
+				        <group string="Articoli Prodotti">				
+                            <button type="object" colspan="1" name="unload_from_bom" string="Load element from BOM" class="oe_highlight"/>
+                            <button type="object" colspan="1" name="confirm_from_bom" string="Confirmed" class="oe_highlight"/>
+                            <newline />
+					        <field name="bom_unload_ids" nolabel="1" colspan="4">
+					            <tree string="unload BOM list" editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="lot_id" domain="[('product_id','=',product_id)]"/>
+                                    <field name="uom_id" readonly="1" />
+                                    <field name="quantity" sum="total"/>
+                                </tree>                                
+					        </field>
+					    </group>
+				    </page>
+                </notebook>		
+            </xpath>            
+        </field>
+    </record>
+    
     </data>
 </openerp>
 
