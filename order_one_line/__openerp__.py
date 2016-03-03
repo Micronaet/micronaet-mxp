@@ -31,11 +31,14 @@
     'depends': [
         'base',
         'sale',
+        'sale_fields',  # Micronaet/micronaet-mxp
+        'sale_address', # Micronaet/micronaet-mx
+        'delivery',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
-        #'security/ir.model.access.csv',    
+        #'security/ir.model.access.csv',
         'order_view.xml',
         ],
     'active': False,
