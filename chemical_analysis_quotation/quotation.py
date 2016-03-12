@@ -261,14 +261,23 @@ class sale_order(osv.osv):
     ''' Add relation fields to parent sale.order
     '''
     _inherit = 'sale.order'
-    _name = 'sale.order'
 
+    # Button event function:
+    def add_analysis_to_order_line(self, cr, uid, ids, context=None):
+        ''' Add analysis record and open pop up view:
+        '''
+    
+    def remove_analysis_to_order_line(self, cr, uid, ids, context=None):
+       ''' Remove analysis record (hide in report 
+       '''    
+    
+    
     # button function:
     def load_order_lines(self, cr, uid, ids, context = None):
         ''' Load the list of lines that require analysis
         '''
         # Set show analysis in order report:
-        self.write(cr, uid, ids, {'show_analysis': True,}, context = context)
+        self.write(cr, uid, ids, {'show_analysis': True}, context=context)
         
         # Load analysis elements from sale order
         analysis_pool = self.pool.get('sale.order.line.analysis') 
@@ -276,7 +285,8 @@ class sale_order(osv.osv):
         order_proxy = self.browse(cr, uid, ids, context=context)
         for line in order_proxy[0].order_line:
             if line.analysis_required:
-                analysis_ids = analysis_pool.search(cr, uid, [('line_id','=',line.id)], context=context)
+                analysis_ids = analysis_pool.search(cr, uid, [
+                    ('line_id', '=', line.id)], context=context)
                 if not analysis_ids: # create line
                     analysis_pool.create(cr, uid, {
                         'line_id': line.id,
