@@ -30,7 +30,7 @@
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree" position="attributes">
                <attribute name="colors">blue:analysis_required==True</attribute>
            </xpath>
-           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='price_subtotal']" position="after">
+           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='price_subtotal']" position="before">
                <field name="analysis_required" invisible="1" />
                <button name="add_analysis_to_order_line" type="object" string="Analysis" icon="STOCK_DND"/>
                <button name="remove_analysis_to_order_line" type="object" string="No analysis" attrs="{'invisible':[('analysis_required','=',False)]}" icon="terp-gtk-stop"/>

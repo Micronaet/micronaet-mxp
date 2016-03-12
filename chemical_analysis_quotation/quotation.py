@@ -73,7 +73,10 @@ class sale_order_line_analysis(osv.osv):
         if not product_id:
             return res
 
-        partner_id = context.get('partner_id', False)
+        try:
+            partner_id = chemical_line_proxy.line_id.order_id.partner_id.id
+        except:
+            partner_id = False    
         if partner_id: 
             analysis_pool = self.pool.get('chemical.analysis.partner')
             analysis_ids = analysis_pool.search(
@@ -268,7 +271,7 @@ class sale_order_line(osv.osv):
         # Load analysis elements from sale order
         analysis_pool = self.pool.get('sale.order.line.analysis')         
         line_proxy = self.browse(cr, uid, ids, context=context)
-        import pdb; pdb.set_trace()
+
         self.write(cr, uid, ids, {
             'analysis_required': True}, context=context)
 
