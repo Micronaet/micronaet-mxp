@@ -262,12 +262,15 @@ class sale_order_line_analysis(osv.osv):
 class sale_order_line(osv.osv):
     ''' Add relation fields to parent sale.order
     '''
-    _inherit = 'sale.order.line'
+    _inherit = 'sale.order'
 
-    # Button event function:
-    def add_analysis_to_order_line(self, cr, uid, ids, context=None):
-        ''' Add analysis record and open pop up view:
+    # button function:
+    def load_order_lines(self, cr, uid, ids, context=None):
+        ''' Load the list of lines that require analysis
         '''
+        # Set show analysis in order report:
+        self.write(cr, uid, ids, {'show_analysis': True,}, context=context)
+        
         # Load analysis elements from sale order
         analysis_pool = self.pool.get('sale.order.line.analysis')         
         line_proxy = self.browse(cr, uid, ids, context=context)
@@ -278,11 +281,9 @@ class sale_order_line(osv.osv):
         for line in line_proxy:
             if line.analysis_required:
                 analysis_ids = analysis_pool.search(cr, uid, [
-                    ('line_id', '=', line.id)], context=context)
-                if analysis_ids: # create line
-                    analysis_id = analysis_ids[0]
-                else:
-                    analysis_id = analysis_pool.create(cr, uid, {
+                    ('line_id','=',line.id)], context=context)
+                if not analysis_ids: # create line
+                    analysis_pool.create(cr, uid, {
                         'line_id': line.id,
                         'lot_id': False,
                         'analysis_id': False,
