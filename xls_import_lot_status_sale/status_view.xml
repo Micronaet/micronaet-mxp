@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-    <record id='view_sale_order_analysis_xls_qty_form' model='ir.ui.view'>
-        <field name='name'>Order line status lot</field>
-        <field name='model'>sale.order</field>
-        <field name="inherit_id" ref="chemical_analysis_quotation.view_sale_order_analysis_form" />
-        <field name='arch' type='xml'>
-            <xpath expr="//tree//field[@name='lot_id']" position="after">
-                <field name="xls_qty" />
-            </xpath>
-        </field>
-     </record>
+        <record id='view_sale_order_analysis_xls_qty_line_form' model='ir.ui.view'>
+            <field name='name'>Order line status lot</field>
+            <field name='model'>sale.order.line.analysis</field>
+            <field name="inherit_id" ref="chemical_analysis_quotation.view_sale_order_line_analysis_tree" />
+            <field name='arch' type='xml'>
+                <field name="lot_id" position="after">
+                    <field name="xls_qty" />
+                </field>
+            </field>
+         </record>
     </data>
 </openerp>
 

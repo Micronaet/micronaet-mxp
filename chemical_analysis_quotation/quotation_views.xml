@@ -27,11 +27,13 @@
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//field[@name='product_id']" position="after">
                <field name="analysis_required" invisible="1"/>
            </xpath>
-           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='product_id']" position="before">
-               <field name="analysis_required" invisible="1" />
-           </xpath>
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree" position="attributes">
                <attribute name="colors">blue:analysis_required==True</attribute>
+           </xpath>
+           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='price_subtotal']" position="after">
+               <field name="analysis_required" invisible="1" />
+               <button name="add_analysis_to_order_line" type="object" string="Analysis" icon="STOCK_DND"/>
+               <button name="remove_analysis_to_order_line" type="object" string="No analysis" attrs="{'invisible':[('analysis_required','=',False)]}" icon="terp-gtk-stop"/>
            </xpath>
            <!--<xpath expr="/form/sheet/notebook/page[@string='Order Lines']" position="after">
                <page string = "Analysis">
@@ -60,7 +62,6 @@
                     <field name = 'version' />
                 </tree>-->
                 <tree string="Quotation analysis">
-                    <field name='order_id' invisible="1"/>
                     <field name='line_id' invisible="1" />
                     <field name='product_id'/>
                     <field name='lot_id' />
@@ -92,7 +93,6 @@
                     <separator string="Specifics text" colspan="2" />
                     <field name='analysis_text' colspan="2" nolabel="1"/>
                     <field name='specific_text' colspan="2" nolabel="1" on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
-                    <field name='order_id' invisible="1"/>
                     <field name='line_id' invisible="1" />
                     <field name='product_id' invisible="1"/>
                 </form>      
