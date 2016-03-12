@@ -44,15 +44,19 @@ class SaleOrderLine(orm.Model):
     
     _inherit = 'sale.order.line'
 
-    # -------------
-    # Button event:
-    # -------------
     def create_splitted_order(self, cr, uid, ids, context=None):
+        # get section
         line_proxy = self.browse(
             cr, uid, ids, context=context)[0]
+        section = 0    
+        for line in line_proxy.order_id.order_line:        
+            res = line.split_order_id.section
+            if type(res) == int and res > section:
+                section = res
+        section += 1
         
         item_id = self.pool.get('sale.order').create_order_from_line(
-            cr, uid, line_proxy, context=context)
+            cr, uid, line_proxy, section, context=context)
             
         return {
             'type': 'ir.actions.act_window',
@@ -113,17 +117,12 @@ class SaleOrder(orm.Model):
     # --------
     # Utility:
     # --------
-    def create_order_from_line(self, cr, uid, line_proxy, context=None):
+    def create_order_from_line(self, cr, uid, line_proxy, section, 
+            context=None):
         ''' Utility function for create order from line
         '''
         # Pool used:
         line_pool = self.pool.get('sale.order.line')
-        
-        if line_proxy.order_id.master_id:
-            raise osv.except_osv(
-                _('Error'), 
-                _('This is a child order no more child!'),
-                )
         
         if line_proxy.split_order_id:
             return line_proxy.split_order_id.id # jet present
@@ -134,8 +133,10 @@ class SaleOrder(orm.Model):
             # Manage field:
             'is_splitted': True,     
             'master_id': parent_header.id,       
+            'section': section,
             
             # Order field to copy:
+            #'name': '%s-%s' % (parent_header.name, section),
             'date_order': parent_header.date_order,
             'deadline_order': parent_header.deadline_order,
             'validity': parent_header.validity,
@@ -155,6 +156,9 @@ class SaleOrder(orm.Model):
             'pricelist_id': parent_header.pricelist_id.id,
             'address_id': parent_header.address_id.id,
             'invoice_id': parent_header.invoice_id.id,
+
+            'partner_invoice_id': parent_header.partner_id.id,
+            'partner_shipping_id': parent_header.partner_id.id,
             'carrier_id': parent_header.carrier_id.id,
             
             #'date_valid': parent_header.date_valid, # mx_sale
@@ -202,6 +206,7 @@ class SaleOrder(orm.Model):
     def action_button_confirm(self, cr, uid, ids, context=None):
         ''' Not confirmed the order just cancel and create suborders
         '''
+        section = 0
         lines = self.browse(cr, uid, ids, context=context)[0].order_line
         if len(lines) == 1:
             return super(SaleOrder, self).action_button_confirm(
@@ -212,9 +217,10 @@ class SaleOrder(orm.Model):
             # -----------------------
             # Create order from line:
             # -----------------------
+            section += 1
             active_ids.append(
                 self.create_order_from_line(
-                    cr, uid, line, context=context))
+                    cr, uid, line, section, context=context))
         
         self.write(cr, uid, ids, {
             'is_master': True,
@@ -238,8 +244,8 @@ class SaleOrder(orm.Model):
 
     
     _columns = {
-        #'section': fields.integer('Section'), 
-        'master_id': fields.many2one('sale.order', 'Master'),
+        'section': fields.integer('Section'), 
+        'master_id': fields.many2one('sale.order.line', 'Master'),
         'master_section': fields.integer('Section'), 
         'is_splitted': fields.boolean('Is splitted'),
         'is_master': fields.boolean('Is master'), # needed?
