@@ -123,6 +123,12 @@ class SaleOrder(orm.Model):
         '''
         # Pool used:
         line_pool = self.pool.get('sale.order.line')
+
+        if line_proxy.order_id.master_id:
+            raise osv.except_osv(
+                _('Error'), 
+                _('This is a child order no more child!'),
+                )
         
         if line_proxy.split_order_id:
             return line_proxy.split_order_id.id # jet present
