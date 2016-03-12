@@ -73,10 +73,7 @@ class sale_order_line_analysis(osv.osv):
         if not product_id:
             return res
 
-        try:
-            partner_id = chemical_line_proxy.line_id.order_id.partner_id.id
-        except:
-            partner_id = False    
+        partner_id = context.get('partner_id', False)
         if partner_id: 
             analysis_pool = self.pool.get('chemical.analysis.partner')
             analysis_ids = analysis_pool.search(
@@ -233,6 +230,7 @@ class sale_order_line_analysis(osv.osv):
         'only_chemical': fields.boolean('Only chemical', required=False, help = 'Only chemical symbol in analysis text'),
         'standard_analysis': fields.boolean('Standard analysis', required=False, help = 'Don\'t take analysis values, only model element indication'),
         'line_id': fields.many2one('sale.order.line','Order line', required = True, readonly = False, help = "Quotation line linked to this analysys"),
+        'order_id': fields.many2one('sale.order', 'Order', required=True, readonly = False), 
         'product_id': fields.related('line_id', 'product_id', type='many2one', relation='product.product', string='Product', store = True),
         'lot_id': fields.many2one('stock.production.lot', 'Lot', required=False, readonly=False, help="Lot selected for this quotation"),
         'xls_qty': fields.related('lot_id', 'xls_qty', type='float', string='Q. disp', digit=(16,3),store=False),
@@ -259,60 +257,52 @@ class sale_order_line_analysis(osv.osv):
         #'lot_status_text': lambda s, cr, uid, ctx: s.get_default_status(cr, uid, context=ctx),
     }
 
-class sale_order_line(osv.osv):
+class sale_order(osv.osv):
     ''' Add relation fields to parent sale.order
     '''
     _inherit = 'sale.order'
+    _name = 'sale.order'
 
     # button function:
-    def load_order_lines(self, cr, uid, ids, context=None):
+    def load_order_lines(self, cr, uid, ids, context = None):
         ''' Load the list of lines that require analysis
         '''
         # Set show analysis in order report:
-        self.write(cr, uid, ids, {'show_analysis': True,}, context=context)
+        self.write(cr, uid, ids, {'show_analysis': True,}, context = context)
         
         # Load analysis elements from sale order
-        analysis_pool = self.pool.get('sale.order.line.analysis')         
-        line_proxy = self.browse(cr, uid, ids, context=context)
-
-        self.write(cr, uid, ids, {
-            'analysis_required': True}, context=context)
-
-        for line in line_proxy:
+        analysis_pool = self.pool.get('sale.order.line.analysis') 
+        
+        order_proxy = self.browse(cr, uid, ids, context=context)
+        for line in order_proxy[0].order_line:
             if line.analysis_required:
-                analysis_ids = analysis_pool.search(cr, uid, [
-                    ('line_id','=',line.id)], context=context)
+                analysis_ids = analysis_pool.search(cr, uid, [('line_id','=',line.id)], context=context)
                 if not analysis_ids: # create line
                     analysis_pool.create(cr, uid, {
                         'line_id': line.id,
+                        'order_id': ids[0],
+                        # sequence
+                        #'product_id': line.product_id.id,
                         'lot_id': False,
                         'analysis_id': False,
+                        #'version': 'internal', # default
+                        #'analysis_text': False, << on_change function for compilation
                     }, context=context)
-                    
-        #view_id = self.pool.get('ir.ui.view').search(cr,uid,[
-        #    ('model', '=', 'mrp.production.create.wizard'),
-        #    ('name', '=', 'Create production order') # TODO needed?
-        #    ], context=context)
-        
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Analysis view',
-            'res_model': 'sale.order.line.analysis',
-            'res_id': analysis_id,
-            'view_type': 'form',
-            'view_mode': 'form',
-            #'view_id': view_id,
-            'target': 'new',
-            'nodestroy': True,
-            }
+        return True
+
+    _columns = {
+        'analysis_ids': fields.one2many('sale.order.line.analysis', 'order_id', 'Analysis'),
+        'show_analysis': fields.boolean('Show analysis', required=False, help = 'Show analysis page in offer report'),
+    }
+    _defaults = {
+        'show_analysis': False,
+    }
     
-    def remove_analysis_to_order_line(self, cr, uid, ids, context=None):
-        ''' Remove analysis record (hide in report 
-        '''    
-        sol_pool = self.pool.get('sale.order.line')
-        sol_pool.write(cr, uid, ids, {
-            'analysis_required': False}, context=context)
-        return True    
+class sale_order_line(osv.osv):
+    ''' Add relation fields to parent sale.order
+    '''
+    _inherit = 'sale.order.line'
+    _name = 'sale.order.line'
 
     _columns = {
         'analysis_required': fields.boolean('Anal. req.', help='If checked the analysis is printed in the quotation'),
@@ -326,6 +316,7 @@ class res_users(osv.osv):
     ''' Add extra field
     '''
     _inherit = 'res.users'
+    _name = 'res.users'
 
     _columns = {
         'offer_ccn_id': fields.many2one('res.users', 'Offer CCN user', required = False),
