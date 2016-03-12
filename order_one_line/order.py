@@ -245,7 +245,7 @@ class SaleOrder(orm.Model):
     
     _columns = {
         'section': fields.integer('Section'), 
-        'master_id': fields.many2one('sale.order.line', 'Master'),
+        'master_id': fields.many2one('sale.order', 'Master'),
         'master_section': fields.integer('Section'), 
         'is_splitted': fields.boolean('Is splitted'),
         'is_master': fields.boolean('Is master'), # needed?
