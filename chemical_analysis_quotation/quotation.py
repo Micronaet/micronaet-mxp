@@ -261,7 +261,6 @@ class sale_order(osv.osv):
     ''' Add relation fields to parent sale.order
     '''
     _inherit = 'sale.order'
-    _name = 'sale.order'
 
     # button function:
     def load_order_lines(self, cr, uid, ids, context = None):
@@ -302,7 +301,6 @@ class sale_order_line(osv.osv):
     ''' Add relation fields to parent sale.order
     '''
     _inherit = 'sale.order.line'
-    _name = 'sale.order.line'
 
     _columns = {
         'analysis_required': fields.boolean('Anal. req.', help='If checked the analysis is printed in the quotation'),
@@ -316,7 +314,6 @@ class res_users(osv.osv):
     ''' Add extra field
     '''
     _inherit = 'res.users'
-    _name = 'res.users'
 
     _columns = {
         'offer_ccn_id': fields.many2one('res.users', 'Offer CCN user', required = False),
