@@ -36,9 +36,7 @@
         ],
     'init_xml': [],
     'demo': [],
-    'data': [
-        'status_view.xml',
-        ],
+    'data': [],
     'active': False,
     'installable': True,
     'auto_install': False,
