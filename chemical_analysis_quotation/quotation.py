@@ -46,6 +46,31 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
             
     separator = ': ' # for title to value (chemical elements)
                 
+    # Button event:
+    def save_wizard_data(self, cr, uid, ids, context=None):
+        ''' Save data on line
+        '''
+        sol_pool = self.pool.get('sale.order.line')
+        wiz_proxy = self.browse(cr, uid, ids, context=context)[0]
+        
+        sol_id = wiz_proxy.line_id.id
+        sol_pool.write(cr, uid, sol_id, {
+            #'line_id': ids[0],
+            'lot_id': wiz_proxy.lot_id.id or False,
+            #'product_id': line_proxy.product_id.id or False,
+            'price_telquel': wiz_proxy.price_telquel,
+            'analysis_id': wiz_proxy.analysis_id.id or False,            
+
+            'price_telquel': wiz_proxy.price_telquel or False,
+            'price_percentage': wiz_proxy.price_percentage or False,
+            'analysis_text': wiz_proxy.analysis_text or False,
+            'specific_text': wiz_proxy.specific_text or False,
+            'only_chemical': wiz_proxy.only_chemical or False,
+            'standard_analysis': wiz_proxy.standard_analysis or False,
+            'version': wiz_proxy.version or False,
+            }, context=context)
+        return True
+        
     # onchange events:
     def onchange_lot(self, cr, uid, ids, lot_id, context=None):
         ''' Change lot element
@@ -72,7 +97,10 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         '''
         # on change results:
         res = {'value': {'analysis_text': '', 'specific_text': ''}}
-        
+
+        if not ids:
+            return res
+            
         # current record:
         chemical_line_proxy = self.browse(cr, uid, ids, context=context)[0] 
         
@@ -256,26 +284,21 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         'lot_id': fields.many2one(
             'stock.production.lot', 'Lot', 
             help='Lot selected for this quotation'),
-        #'xls_qty': fields.related('lot_id', 'xls_qty', type='float', string='Q. disp', digit=(16,3),store=False),
+        #'xls_qty': fields.related('lot_id', 'xls_qty', type='float', 
+        #string='Q. disp', digit=(16,3),store=False),
         
         'analysis_id': fields.many2one('chemical.analysis', 'Analysis sheet', 
             help='Analysis selected for print in quotation'),
         'version': fields.selection(version_list, 'Version', 
             help='Choose which one of the analysis use on quotation'),
         'analysis_text': fields.text('Analysis', 
-            help="Get text and values from analysis but let user change some elements"),
+            help='Text-values from analysis but let user changes'),
         'specific_text': fields.text('Specific', 
-            help="Add specific text of product"),
+            help='Add specific text of product'),
         }
     
     _defaults = {
         # TODO extra defaults to load (tranform all): <<< from sale order line
-        # line_id
-        # product_id
-        # lot_id
-        # price_telquel
-        # price_percentage
-        # analysis_id
         # analysis_text
         # specific_text
         #'only_chemical': 
@@ -292,10 +315,53 @@ class sale_order_line(osv.osv):
     def need_analysis(self, cr, uid, ids, context=None):
         '''        
         '''
+        self.write(cr, uid, ids, {
+            'analysis_required': False,
+            }, context=context)
+            
+        line_proxy = self.browse(cr, uid, ids, context=context)[0]    
+
+        # Open wizard:
+        model_pool = self.pool.get('ir.model.data')
+        view_id = model_pool.get_object_reference(cr, uid,             
+            'chemical_analysis_quotation', 
+            'view_sale_order_line_analysis_wizard_form')[1]
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Analysis detail:'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sale.order.line.analysis.wizard',
+            'view_id': view_id, # False
+            #'views': [(False, 'tree'), (False, 'form')],
+            #'domain': [],
+            'context': {
+                'default_line_id': ids[0],
+                'default_lot_id': line_proxy.lot_id.id or False,
+                'default_product_id': line_proxy.product_id.id or False,
+                'default_price_telquel': line_proxy.price_telquel,
+                'default_analysis_id': line_proxy.analysis_id.id or False,
+
+                'default_price_telquel': line_proxy.price_telquel or False,
+                'default_price_percentage': line_proxy.price_percentage or False,
+                'default_analysis_text': line_proxy.analysis_text or False,
+                'default_specific_text': line_proxy.specific_text or False,
+                'default_only_chemical': line_proxy.only_chemical or False,
+                'default_standard_analysis': line_proxy.standard_analysis or False,
+                'default_version': line_proxy.version or False,
+                },
+            'target': 'new',
+            'nodestroy': False,
+            }
+        
         return True
     def remove_analysis(self, cr, uid, ids, context=None):
-        '''        
+        ''' 
         '''
+        self.write(cr, uid, ids, {
+            'analysis_required': False,
+            }, context=context)
         return True
         
     _columns = {

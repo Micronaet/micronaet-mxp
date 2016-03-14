@@ -27,10 +27,10 @@
            <!--<xpath expr="/form/sheet/notebook/page[@string='Order Lines']//field[@name='product_id']" position="after">
                <field name="analysis_required" invisible="1"/>
            </xpath>-->
-           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='price_subtotal']" position="after">
+           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='price_subtotal']" position="before">
                <field name="analysis_required" invisible="1"/>
-               <button name="need_analysis" string="Analysis" type="object" />
-               <button name="remove_analysis" string="No analysis" type="object" attrs="{'invisible':[('analysis_required','=',False)]}"/>
+               <button name="need_analysis" string="Analysis" type="object" icon="gtk-dnd-multiple" />
+               <button name="remove_analysis" string="No analysis" type="object" attrs="{'invisible':[('analysis_required','=',False)]}" icon="gtk-missing-image"/>
            </xpath>
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='product_id']" position="after">
                <field name="lot_id" domain="[('product_id', '=', product_id)]"/>
@@ -118,24 +118,30 @@
             <field name='model'>sale.order.line.analysis.wizard</field>
             <field name='arch' type='xml'>
                 <form string="Quotation analysis" version="7.0">
+                    <head>
+                        <button name="save_wizard_data" string="Save" type="object" class="oe_highlight"/>
+                        <button special="cancel" string="Cancel" />
+                    </head>
                     <sheet>
-                        <group colspan="2" attrs="{'invisible':[('standard_analysis','=',True)]}">
-                            <field name='lot_id' on_change="onchange_lot(lot_id)" domain="[('product_id','=',product_id)]"/>
-                            <field name='analysis_id' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' domain="[('prodlot_id','=',lot_id)]" attrs="{'invisible': [('lot_id','=',False)]}"/>
-                        </group>                                
-                        <group colspan="2">
-                            <field name='standard_analysis' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
-                            <field name='only_chemical' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' />
-                            <field name='version' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' attrs="{'invisible': ['|',('analysis_id','=',False),('standard_analysis','=',True)]}"/>
-                        </group>                                
-                        <separator string="Analysis text (Rows with: Element &#124; Value)" colspan="2"/>
-                        <separator string="Specifics text" colspan="2" />
-                        <field name='analysis_text' colspan="2" nolabel="1"/>
-                        <field name='specific_text' colspan="2" nolabel="1" on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
+                        <group colspan="4" col="4">
+                            <group colspan="2" attrs="{'invisible':[('standard_analysis','=',True)]}">
+                                <field name='lot_id' on_change="onchange_lot(lot_id)" domain="[('product_id','=',product_id)]"/>
+                                <field name='analysis_id' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' domain="[('prodlot_id','=',lot_id)]" attrs="{'invisible': [('lot_id','=',False)]}"/>
+                            </group>                                
+                            <group colspan="2">
+                                <field name='standard_analysis' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
+                                <field name='only_chemical' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' />
+                                <field name='version' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' attrs="{'invisible': ['|',('analysis_id','=',False),('standard_analysis','=',True)]}"/>
+                            </group>                                
+                            <separator string="Analysis text (Rows with: Element &#124; Value)" colspan="2"/>
+                            <separator string="Specifics text" colspan="2" />
+                            <field name='analysis_text' colspan="2" nolabel="1"/>
+                            <field name='specific_text' colspan="2" nolabel="1" on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
 
-                        <field name='line_id' invisible="1" />
-                        <field name='product_id' invisible="1"/>                                
-                    </sheet>    
+                            <field name='line_id' invisible="1" />
+                            <field name='product_id' invisible="1"/>                                
+                        </group>    
+                    </sheet>
                 </form>
             </field>               
     </record>
