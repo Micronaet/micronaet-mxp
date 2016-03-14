@@ -55,12 +55,8 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         
         sol_id = wiz_proxy.line_id.id
         sol_pool.write(cr, uid, sol_id, {
-            #'line_id': ids[0],
             'lot_id': wiz_proxy.lot_id.id or False,
-            #'product_id': line_proxy.product_id.id or False,
-            'price_telquel': wiz_proxy.price_telquel,
             'analysis_id': wiz_proxy.analysis_id.id or False,            
-
             'price_telquel': wiz_proxy.price_telquel or False,
             'price_percentage': wiz_proxy.price_percentage or False,
             'analysis_text': wiz_proxy.analysis_text or False,
@@ -90,28 +86,27 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
                 res['value']['analysis_id'] = chemical_ids[0]
         return res
         
-    def onchange_analysis(self, cr, uid, ids, analysis_id, version, 
+    def onchange_analysis(self, cr, uid, ids, line_id, analysis_id, version, 
             only_chemical, lot_id, standard_analysis, context=None):
         ''' Search in analysis selected and generate a text for analysis 
             and for specific
         '''
         # on change results:
         res = {'value': {'analysis_text': '', 'specific_text': ''}}
-
-        if not ids:
-            return res
-            
-        # current record:
-        chemical_line_proxy = self.browse(cr, uid, ids, context=context)[0] 
         
-        product_id = chemical_line_proxy.product_id and \
-            chemical_line_proxy.product_id.id
+        if not line_id:
+            return res
+        
+        sol_pool = self.pool.get('sale.order.line')    
+        sol_proxy = sol_pool.browse(cr, uid, line_id, context=context)
+        
+        product =  sol_proxy.product_id # readability
+        product_id = product and product.id
         if not product_id:
             return res
 
         try: # Change for get element from order:
-            partner_id = chemical_line_proxy.line_id.order_id.partner_id.id 
-            #context.get('partner_id', False)
+            partner_id = sol_proxy.line_id.order_id.partner_id.id 
         except:
             partner_id = False    
             
@@ -133,8 +128,7 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
             # ----------------------------
             # Load list of model elements:
             # ----------------------------
-            model_id = chemical_line_proxy.product_id.model_id and \
-                chemical_line_proxy.product_id.model_id.id
+            model_id = product.model_id and product.model_id.id
             if not model_id:
                 return res
                 
@@ -237,30 +231,31 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
 
                 # --------------------
                 # Load customer specs:
-                # --------------------                    
-                for analysis in partner_analysis_proxy:
-                    res['value']['specific_text'] += _(
-                        'Analysis dated: %s (vers. %s)\n') % (
-                            analysis.date,
-                            analysis.version,
-                    )
-                    actual_value = element.__getattr__(version) or 0.0
-                    for line in analysis.analysis_line_ids:
-                        from_value = line.__getattr__('from') or 0.0
-                        to_value = line.to or 100
-                        if line.name.id in test_element:
-                            if actual_value >= from_value and actual_value <= \
-                                    to_value:
-                                error = ''
-                            else:
-                                error = _('*** Out of range')
-                        else:
-                            error = _('*** Element not present')
+                # --------------------             
+                if partner_analysis_proxy:       
+                    for analysis in partner_analysis_proxy:
                         res['value']['specific_text'] += _(
-                            '%s: from %s%s to %s%s %s\n') % (
-                                line.name.symbol if only_chemical else \
-                                    line.name.name,
-                                from_value, '%', to_value, '%', error)
+                            'Analysis dated: %s (vers. %s)\n') % (
+                                analysis.date,
+                                analysis.version,
+                        )
+                        actual_value = element.__getattr__(version) or 0.0
+                        for line in analysis.analysis_line_ids:
+                            from_value = line.__getattr__('from') or 0.0
+                            to_value = line.to or 100
+                            if line.name.id in test_element:
+                                if actual_value >= from_value and \
+                                        actual_value <= to_value:
+                                    error = ''
+                                else:
+                                    error = _('*** Out of range')
+                            else:
+                                error = _('*** Element not present')
+                            res['value']['specific_text'] += _(
+                                '%s: from %s%s to %s%s %s\n') % (
+                                    line.name.symbol if only_chemical else \
+                                        line.name.name,
+                                    from_value, '%', to_value, '%', error)
         return res
 
     _columns = {
@@ -296,15 +291,10 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         'specific_text': fields.text('Specific', 
             help='Add specific text of product'),
         }
-    
+        
     _defaults = {
-        # TODO extra defaults to load (tranform all): <<< from sale order line
-        # analysis_text
-        # specific_text
-        #'only_chemical': 
-        #'standard_analysis':
-        #'version':
-        }
+        'price_telquel': lambda *x: True,
+        }    
     
 class sale_order_line(osv.osv):
     ''' Add relation fields to parent sale.order
@@ -327,6 +317,21 @@ class sale_order_line(osv.osv):
             'chemical_analysis_quotation', 
             'view_sale_order_line_analysis_wizard_form')[1]
 
+        ctx = {
+            'default_line_id': ids[0],
+            'default_lot_id': line_proxy.lot_id.id or False,
+            'default_product_id': line_proxy.product_id.id or False,
+            'default_price_telquel': line_proxy.price_telquel,
+            'default_analysis_id': line_proxy.analysis_id.id or False,
+
+            'default_price_telquel': line_proxy.price_telquel or False,
+            'default_price_percentage': line_proxy.price_percentage or False,
+            'default_analysis_text': line_proxy.analysis_text or False,
+            'default_specific_text': line_proxy.specific_text or False,
+            'default_only_chemical': line_proxy.only_chemical or False,
+            'default_standard_analysis': line_proxy.standard_analysis or False,
+            'default_version': line_proxy.version or False,
+            }
         return {
             'type': 'ir.actions.act_window',
             'name': _('Analysis detail:'),
@@ -334,23 +339,7 @@ class sale_order_line(osv.osv):
             'view_mode': 'form',
             'res_model': 'sale.order.line.analysis.wizard',
             'view_id': view_id, # False
-            #'views': [(False, 'tree'), (False, 'form')],
-            #'domain': [],
-            'context': {
-                'default_line_id': ids[0],
-                'default_lot_id': line_proxy.lot_id.id or False,
-                'default_product_id': line_proxy.product_id.id or False,
-                'default_price_telquel': line_proxy.price_telquel,
-                'default_analysis_id': line_proxy.analysis_id.id or False,
-
-                'default_price_telquel': line_proxy.price_telquel or False,
-                'default_price_percentage': line_proxy.price_percentage or False,
-                'default_analysis_text': line_proxy.analysis_text or False,
-                'default_specific_text': line_proxy.specific_text or False,
-                'default_only_chemical': line_proxy.only_chemical or False,
-                'default_standard_analysis': line_proxy.standard_analysis or False,
-                'default_version': line_proxy.version or False,
-                },
+            'context': ctx,
             'target': 'new',
             'nodestroy': False,
             }
