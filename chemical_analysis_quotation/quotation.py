@@ -266,7 +266,7 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
     _columns = {
         'price_telquel': fields.boolean('Price telquel', 
             help='Tel Quel price'),
-        'price_perentage': fields.float('Based perc.', digits=(16, 3), 
+        'price_percentage': fields.float('Based perc.', digits=(16, 3), 
             help='If not tel quel price this is based percentage'),     
 
         'only_chemical': fields.boolean(
