@@ -46,10 +46,13 @@ class Parser(report_sxw.rml_parse):
         ''' Return a browse object linked to move_id element with analysis
         '''
         analysis_pool = self.pool.get('sale.order.line.analysis')
-        analysis_ids = analysis_pool.search(self.cr, self.uid, [('line_id', '=', move_id)])
+        analysis_ids = analysis_pool.search(self.cr, self.uid, [
+            ('line_id', '=', move_id)])
         if analysis_ids and len(analysis_ids) == 1:
             try:
-                return analysis_pool.browse(self.cr, self.uid, analysis_ids)[0].analysis_text.split('\n')
+                return analysis_pool.browse(
+                    self.cr, self.uid, analysis_ids)[
+                        0].analysis_text.split('\n')
             except:
                 return ""
         else:
