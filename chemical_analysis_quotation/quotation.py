@@ -74,10 +74,19 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         '''
         res = {'value': {}}
 
+        print context
+        print "LOT"
+        context = context or {}
+        if context.get('init_call_onchange_lot', 0) > 0:
+            print "JUMP LOT" 
+            context['init_call_onnchange_lot'] -= 1 # mask as passed!
+            return res
+        print context
+        
         res['value']['analysis_id'] = False    # reset analysis
         res['value']['version'] = 'percentage'   # reset version
         res['value']['analysis_text'] = False  # reset text
-
+        
         if lot_id:
             chemical_pool = self.pool.get('chemical.analysis')
             chemical_ids = chemical_pool.search(cr, uid, [
@@ -93,6 +102,15 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         '''
         # on change results:
         res = {'value': {'analysis_text': '', 'specific_text': ''}}
+
+        context = context or {}
+
+        print context
+        print "ANALYSYS"
+        if context.get('init_call_onchange_analysis', 0) > 0:
+            context['init_call_onchange_analysis'] -= 1 # mask as passed!
+            return res
+        print context
         
         if not line_id:
             return res
@@ -106,7 +124,7 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
             return res
 
         try: # Change for get element from order:
-            partner_id = sol_proxy.line_id.order_id.partner_id.id 
+            partner_id = sol_proxy.order_id.partner_id.id 
         except:
             partner_id = False    
             
@@ -306,7 +324,7 @@ class sale_order_line(osv.osv):
         '''        
         '''
         self.write(cr, uid, ids, {
-            'analysis_required': False,
+            'analysis_required': True,
             }, context=context)
             
         line_proxy = self.browse(cr, uid, ids, context=context)[0]    
@@ -320,10 +338,9 @@ class sale_order_line(osv.osv):
         ctx = {
             'default_line_id': ids[0],
             'default_lot_id': line_proxy.lot_id.id or False,
-            'default_product_id': line_proxy.product_id.id or False,
+            #'default_product_id': line_proxy.product_id.id or False,
             'default_price_telquel': line_proxy.price_telquel,
             'default_analysis_id': line_proxy.analysis_id.id or False,
-
             'default_price_telquel': line_proxy.price_telquel or False,
             'default_price_percentage': line_proxy.price_percentage or False,
             'default_analysis_text': line_proxy.analysis_text or False,
@@ -331,7 +348,12 @@ class sale_order_line(osv.osv):
             'default_only_chemical': line_proxy.only_chemical or False,
             'default_standard_analysis': line_proxy.standard_analysis or False,
             'default_version': line_proxy.version or False,
+            
+            # semaforic, to remove X onchange at start up:
+            'init_call_onnchange_analysis': 5, 
+            'init_call_onnchange_lot': 5,            
             }
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Analysis detail:'),
