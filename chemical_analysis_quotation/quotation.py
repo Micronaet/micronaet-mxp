@@ -218,24 +218,17 @@ class sale_order_line_analysis(osv.osv):
                             )
         return res
 
-    #def get_default_status(self, cr, uid, context=None):
-    #    ''' Search product lot passed and return list of lot with quantity
-    #    '''
-    #    res = ""
-    #    
-    #    return res
-        
     _columns = {
         'sequence': fields.integer('Seq.', help = 'Order of the line'),
-        'only_chemical': fields.boolean('Only chemical', required=False, help = 'Only chemical symbol in analysis text'),
-        'standard_analysis': fields.boolean('Standard analysis', required=False, help = 'Don\'t take analysis values, only model element indication'),
+        'only_chemical': fields.boolean('Only chemical', help = 'Only chemical symbol in analysis text'),
+        'standard_analysis': fields.boolean('Standard analysis', help = 'Don\'t take analysis values, only model element indication'),
         'line_id': fields.many2one('sale.order.line','Order line', required = True, readonly = False, help = "Quotation line linked to this analysys"),
         'order_id': fields.many2one('sale.order', 'Order', required=True, readonly = False), 
         'product_id': fields.related('line_id', 'product_id', type='many2one', relation='product.product', string='Product', store = True),
-        'lot_id': fields.many2one('stock.production.lot', 'Lot', required=False, readonly=False, help="Lot selected for this quotation"),
+        'lot_id': fields.many2one('stock.production.lot', 'Lot', help="Lot selected for this quotation"),
         'xls_qty': fields.related('lot_id', 'xls_qty', type='float', string='Q. disp', digit=(16,3),store=False),
         
-        'analysis_id': fields.many2one('chemical.analysis', 'Analysis sheet', required=False, readonly=False, help = 'Analysis selected for print in quotation',),
+        'analysis_id': fields.many2one('chemical.analysis', 'Analysis sheet', help = 'Analysis selected for print in quotation',),
         'version': fields.selection([
             ('percentage_supplier', 'Supplier'), 
             ('percentage', 'Internal'),
@@ -291,7 +284,7 @@ class sale_order(osv.osv):
 
     _columns = {
         'analysis_ids': fields.one2many('sale.order.line.analysis', 'order_id', 'Analysis'),
-        'show_analysis': fields.boolean('Show analysis', required=False, help = 'Show analysis page in offer report'),
+        'show_analysis': fields.boolean('Show analysis', help = 'Show analysis page in offer report'),
     }
     _defaults = {
         'show_analysis': False,
