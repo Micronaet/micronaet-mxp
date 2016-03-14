@@ -26,9 +26,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+import os
+import sys
+import logging
 from openerp.osv import osv, fields
 from datetime import datetime
 from openerp.tools.translate import _
+
+_logger = logging.getLogger(__name__)
+load_counter_max = 6 # TODO change when add new fields with onchange funct.
 
 version_list = [
     ('percentage_supplier', 'Supplier'), 
@@ -68,24 +74,21 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
         return True
         
     # onchange events:
-    def onchange_lot(self, cr, uid, ids, lot_id, context=None):
+    def onchange_lot(self, cr, uid, ids, lot_id, loaded, context=None):
         ''' Change lot element
             Reset analysis, versione text
         '''
         res = {'value': {}}
 
-        print context
-        print "LOT"
         context = context or {}
-        if context.get('init_call_onchange_lot', 0) > 0:
-            print "JUMP LOT" 
-            context['init_call_onnchange_lot'] -= 1 # mask as passed!
-            return res
-        print context
-        
-        res['value']['analysis_id'] = False    # reset analysis
-        res['value']['version'] = 'percentage'   # reset version
-        res['value']['analysis_text'] = False  # reset text
+
+        _logger.info('Load counter # %s' % loaded)
+        if loaded < load_counter_max:
+            res['value']['loaded'] = loaded + 1
+        else: # not reset if init call:        
+            res['value']['analysis_id'] = False # reset analysis
+            res['value']['version'] = 'percentage' # reset version
+            res['value']['analysis_text'] = False # reset text
         
         if lot_id:
             chemical_pool = self.pool.get('chemical.analysis')
@@ -95,23 +98,28 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
                 res['value']['analysis_id'] = chemical_ids[0]
         return res
         
-    def onchange_analysis(self, cr, uid, ids, line_id, analysis_id, version, 
+    def onchange_analysis(self, cr, uid, ids, line_id, loaded, analysis_id, version, 
             only_chemical, lot_id, standard_analysis, context=None):
         ''' Search in analysis selected and generate a text for analysis 
             and for specific
         '''
         # on change results:
-        res = {'value': {'analysis_text': '', 'specific_text': ''}}
-
         context = context or {}
+        res = {'value': {}}
 
-        print context
-        print "ANALYSYS"
-        if context.get('init_call_onchange_analysis', 0) > 0:
-            context['init_call_onchange_analysis'] -= 1 # mask as passed!
+        _logger.info('Load counter # %s' % loaded)
+
+        if loaded < load_counter_max:
+            res['value']['loaded'] = loaded + 1
             return res
-        print context
+        #if context.get('init_call_onchange_analysis', 0) > 0:
+        #    _logger.info('Analysis pass # %s' % context[
+        #        'init_call_onchange_analysis'])
+        #    context['init_call_onchange_analysis'] -= 1 # mask as passed!
+        #    import pdb; pdb.set_trace()
+        #    return res
         
+        res = {'value': {'analysis_text': '', 'specific_text': ''}}
         if not line_id:
             return res
         
@@ -292,8 +300,8 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
             help = "Quotation line linked to this analysys"),
         #'order_id': fields.many2one('sale.order', 'Order', required=True, 
         #    readonly = False), 
-        'product_id': fields.related('line_id', 'product_id', type='many2one', 
-            relation='product.product', string='Product', store = True),
+        'product_id': fields.many2one('product.product', 'Product', 
+            help='Analysis selected for print in quotation'),
         'lot_id': fields.many2one(
             'stock.production.lot', 'Lot', 
             help='Lot selected for this quotation'),
@@ -308,12 +316,9 @@ class SaleOrderLineAnalysisWizard(osv.osv_memory):
             help='Text-values from analysis but let user changes'),
         'specific_text': fields.text('Specific', 
             help='Add specific text of product'),
+        'loaded': fields.integer('Load # (for onchange)'),
         }
         
-    _defaults = {
-        'price_telquel': lambda *x: True,
-        }    
-    
 class sale_order_line(osv.osv):
     ''' Add relation fields to parent sale.order
     '''
@@ -338,6 +343,7 @@ class sale_order_line(osv.osv):
         ctx = {
             'default_line_id': ids[0],
             'default_lot_id': line_proxy.lot_id.id or False,
+            'default_product_id': line_proxy.product_id.id or False,
             #'default_product_id': line_proxy.product_id.id or False,
             'default_price_telquel': line_proxy.price_telquel,
             'default_analysis_id': line_proxy.analysis_id.id or False,
@@ -350,8 +356,8 @@ class sale_order_line(osv.osv):
             'default_version': line_proxy.version or False,
             
             # semaforic, to remove X onchange at start up:
-            'init_call_onnchange_analysis': 5, 
-            'init_call_onnchange_lot': 5,            
+            'init_call_onchange_analysis': 5, 
+            'init_call_onchange_lot': 1,            
             }
 
         return {
@@ -407,10 +413,11 @@ class sale_order_line(osv.osv):
         'analysis_required': lambda *x: False,
 
         # Wizard defaults:
+        'price_telquel': lambda *x: True,
         'only_chemical': lambda *x: True,
         'standard_analysis': lambda *x: False,
         'version': lambda *x: 'percentage',
-        }
+        }    
 
 class res_users(osv.osv):
     ''' Add extra field

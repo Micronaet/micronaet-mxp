@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data> <!-- noupdate="1">-->
+        <!--Email template -->
+        <record id="email_crm_interven_relation" model="email.template">
+            <field name="name">Relation - Send by Email</field>
+            <field name="email_from">${object.user_id.email or ''}</field>
+            <field name="subject">Relation visit ${object.date or ""} - Ref.: ${object.name or 'n/a' }</field>
+            <field name="email_recipients">${object.relation_manager_id.id}</field>
+            <field name="model_id" ref="base_calendar.model_crm_meeting"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="report_template" ref="report_relation_webkit_html"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="lang">it_IT</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+    <p>Visit customer: ${object.partner_ids[0].name} <br />
+       Date: ${object.date or ""} [Duration: ${object.duration or ""} ${(object.allday and ">> All day <<") or ""}] <br />
+       Location: ${object.location or ""}
+    </p>   
+
+    <p style="border-left: 1px solid #8e0000; margin-left: 30px;">
+       &nbsp;&nbsp;<strong>REFERENCES</strong><br />
+       &nbsp;&nbsp;Visit description: <strong>${object.name}</strong><br />
+       &nbsp;&nbsp;Visit date: ${object.date}<br />
+
+       % if object.user_id:
+       &nbsp;&nbsp;Your contact: <a href="mailto:${object.user_id.email or ''}?subject=Order%20${object.name}">${object.user_id.name}</a>
+       % endif
+    </p>    
+    <p>
+    Questo messaggio è confidenziale e può contenere informazioni riservate.Chi riceve il presente  messaggio e` tenuto a verificare se lo stesso non gli sia pervenuto per  errore.  In tal caso e` pregato di avvisare immediatamente il mittente  e,  tenuto  conto  delle  responsabilita` connesse  all'indebito utilizzo e/o  divulgazione  del  messaggio  e/o  delle  informazioni  in esso contenute,  voglia  cancellare  l'originale  e distruggere  le varie copie  o stampe. 
+    </p>
+    <p>
+    This message is confidential and may contain information that is protected by legal privilege.The receiver  of this message is required to check if  he/she has received it erroneously.  If  so,  the  receiver  is  requested to immediately inform the sender by return mail and - in consideration of the responsibilities  arising from undue use and/or disclosure of the message  and/or  the information contained therein - destroy the original message and any copy or printout thereof.
+    </p>
+</div>
+            ]]></field>
+        </record>
+    </data>
+</openerp>

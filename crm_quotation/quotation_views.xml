@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+	<!--INHERIT--> 
+	   <!--sale.order-->
+    <record id='view_sale_older_custom_fields' model='ir.ui.view'>
+        <field name='name'>Quotation customization</field>
+        <field name='model'>sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name='arch' type='xml'>
+           <field name="user_id" position="before">
+              <field name="only_not_sold" />
+              <field name="with_default_code" />
+           </field>
+           <xpath expr= "/form/sheet/notebook" position="after">
+              <group colspan="4" col="6">
+                  <separator string="Transport" colspan="2" />
+                  <separator string="Package" colspan="2" />
+                  <separator string="Delivery" colspan="2" />
+                  <field name="transport" colspan="2" nolabel="1" />
+                  <field name="package" colspan="2" nolabel="1"/>
+                  <field name="delivery_note" colspan="2" nolabel="1"/>
+              </group>    
+           </xpath>
+        </field>
+    </record>
+  </data>
+</openerp>
