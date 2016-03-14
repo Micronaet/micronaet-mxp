@@ -186,6 +186,18 @@ class SaleOrder(orm.Model):
             'date_deadline': line_proxy.date_deadline,
             'price_unit': line_proxy.price_unit,
             'analysis_required': line_proxy.analysis_required,
+
+            # Chemical analysis:
+            'lot_id': line_proxy.lot_id.id,
+            'analysis_id': line_proxy.analysis_id.id,            
+            'price_telquel': line_proxy.price_telquel,
+            'price_percentage': line_proxy.price_percentage,
+            'analysis_text': line_proxy.analysis_text,
+            'specific_text': line_proxy.specific_text,
+            'only_chemical': line_proxy.only_chemical,
+            'standard_analysis': line_proxy.standard_analysis,
+            'version': line_proxy.version,
+            
             #'tax_id'            
             }, context=context)    
             
