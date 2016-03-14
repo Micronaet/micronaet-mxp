@@ -24,16 +24,18 @@
         <field name='model'>sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name='arch' type='xml'>
-           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//field[@name='product_id']" position="after">
-               <field name="analysis_required"/>
-           </xpath>
+           <!--<xpath expr="/form/sheet/notebook/page[@string='Order Lines']//field[@name='product_id']" position="after">
+               <field name="analysis_required" invisible="1"/>
+           </xpath>-->
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='product_id']" position="before">
-               <field name="analysis_required" />
+               <field name="analysis_required" invisible="1"/>
+               <!--TODO button!!!-->
            </xpath>
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree" position="attributes">
                <attribute name="colors">blue:analysis_required</attribute>
            </xpath>
-           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']" position="after">
+           <!--TODO change with a one2many function fields to see analysis-->
+           <!--<xpath expr="/form/sheet/notebook/page[@string='Order Lines']" position="after">
                <page string = "Analysis">
                    <group colspan="4" col="4">
                        <field name="show_analysis" />
@@ -69,48 +71,72 @@
                                     <field name='specific_text' colspan="2" nolabel="1" on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
                                     <field name='order_id' invisible="1"/>
                                     <field name='line_id' invisible="1" />
-                                    <field name='product_id' invisible="1"/>
-                                
+                                    <field name='product_id' invisible="1"/>                                
                             </form>
                        </field>
                    </group>
-               </page>
+               </page>-->
            </xpath>    
         </field>
     </record>
        
-    <record id='view_sale_order_line_analysis_tree' model='ir.ui.view'>
+    <!--<record id='view_sale_order_line_analysis_tree' model='ir.ui.view'>
          <field name='name'>Order line analysis</field>
-            <field name='model'>sale.order.line.analysis</field>
+            <field name='model'>sale.order.line.analysis.wizard</field>
             <field name='arch' type='xml'>
                 <tree string="Quotation analysis">
                     <field name = 'order_id' invisible="1"/>
                     <field name = 'line_id' />
-                    <!--<field name = 'product_id'/>-->
                     <field name = 'lot_id' />
                     <field name = 'analysis_id' />
                     <field name = 'version' />
                 </tree>
             </field>               
-    </record>
+    </record>-->
 
-    <record id='view_sale_order_line_analysis_form' model='ir.ui.view'>
+    <!--<record id='view_sale_order_line_analysis_form' model='ir.ui.view'>
          <field name='name'>Order line analysis</field>
             <field name='model'>sale.order.line.analysis</field>
             <field name='arch' type='xml'>
                 <form string="Quotation analysis">
                     <field name = 'order_id' invisible="1"/>
                     <field name = 'line_id' invisible = "1" />
-                    <!--<field name = 'product_id' readonly="1" />-->
                     <field name = 'lot_id' on_change = "onchange_lot(lot_id)"/>
                     <field name = 'analysis_id' on_change = 'onchange_analysis(analysis_id, version)'/>
                     <field name = 'version' on_change = 'onchange_analysis(analysis_id, version)'/>
                     <separator string ="Analysis text (Rows with: Element &#124; Value)" colspan="4" />
                     <field name = 'analysis_text' nolabel="1" colspan="4" />
+                </form>
+            </field>               
+    </record>-->
+    <record id='view_sale_order_line_analysis_wizard_form' model='ir.ui.view'>
+         <field name='name'>Analysis detail</field>
+            <field name='model'>sale.order.line.analysis.wizard</field>
+            <field name='arch' type='xml'>
+                <form string="Quotation analysis" version="7.0">
+                    <sheet>
+                        <group colspan="2" attrs="{'invisible':[('standard_analysis','=',True)]}">
+                            <field name='lot_id' on_change="onchange_lot(lot_id)" domain="[('product_id','=',product_id)]"/>
+                            <field name='analysis_id' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' domain="[('prodlot_id','=',lot_id)]" attrs="{'invisible': [('lot_id','=',False)]}"/>
+                        </group>                                
+                        <group colspan="2">
+                            <field name='standard_analysis' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
+                            <field name='only_chemical' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' />
+                            <field name='version' on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)' attrs="{'invisible': ['|',('analysis_id','=',False),('standard_analysis','=',True)]}"/>
+                        </group>                                
+                        <separator string="Analysis text (Rows with: Element &#124; Value)" colspan="2"/>
+                        <separator string="Specifics text" colspan="2" />
+                        <field name='analysis_text' colspan="2" nolabel="1"/>
+                        <field name='specific_text' colspan="2" nolabel="1" on_change='onchange_analysis(analysis_id, version, only_chemical, lot_id, standard_analysis, context)'/>
 
+                        <field name='order_id' invisible="1"/>
+                        <field name='line_id' invisible="1" />
+                        <field name='product_id' invisible="1"/>                                
+                    </sheet>    
                 </form>
             </field>               
     </record>
+
 </data>
 </openerp>
 
