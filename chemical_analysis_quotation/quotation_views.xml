@@ -32,8 +32,11 @@
                <button name="need_analysis" string="Analysis" type="object" icon="gtk-dnd-multiplex" />
                <button name="remove_analysis" string="No analysis" type="object" attrs="{'invisible':[('analysis_required','=',False)]}" icon="gtk-missing-image"/>
            </xpath>
+           <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='product_id']" position="attributes">
+               <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+           </xpath>
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree/field[@name='product_id']" position="after">
-               <field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'show_lot_status':True}"/>
+               <field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'show_lot_status':True}" options="{'limit': 10, 'create': false, 'create_edit': false}"/>
            </xpath>
            <xpath expr="/form/sheet/notebook/page[@string='Order Lines']//tree" position="attributes">
                <attribute name="colors">blue:analysis_required</attribute>
@@ -126,7 +129,7 @@
                         <group colspan="4" col="4">
                             <group colspan="2" attrs="{'invisible':[('standard_analysis','=',True)]}">
                                 <field name='product_id' invisible="1"/>
-                                <field name='lot_id' on_change="onchange_lot(lot_id, loaded, context)" domain="[('product_id','=',product_id)]"/>
+                                <field name='lot_id' on_change="onchange_lot(lot_id, loaded, context)" domain="[('product_id','=',product_id)]"  context="{'show_lot_status':True}"/>
                                 <field name='analysis_id' on_change='onchange_analysis(line_id, loaded, analysis_id, version, only_chemical, lot_id, standard_analysis, context)' domain="[('prodlot_id','=',lot_id)]" attrs="{'invisible': [('lot_id','=',False)]}"/>
                                 <field name='version' on_change='onchange_analysis(line_id, loaded, analysis_id, version, only_chemical, lot_id, standard_analysis, context)' attrs="{'invisible': ['|',('analysis_id','=',False),('standard_analysis','=',True)]}"/>
                             </group>                                

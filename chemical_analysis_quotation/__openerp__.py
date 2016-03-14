@@ -35,6 +35,7 @@
          'stock',
          'chemical_analysis',
          'xls_import_lot_status',
+         'web_m2x_options', # fields options
          ],
     'init_xml' : [], 
     'update_xml' : [

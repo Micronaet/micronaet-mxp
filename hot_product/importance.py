@@ -59,7 +59,7 @@ class SaleOrder(orm.Model):
         }
         
     _defaults = {
-        'only_hot': lambda *x: True 
+        'only_hot': lambda *x: False, 
         }    
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
