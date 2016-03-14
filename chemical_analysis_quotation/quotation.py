@@ -288,6 +288,16 @@ class sale_order_line(osv.osv):
     '''
     _inherit = 'sale.order.line'
 
+    #button events:
+    def need_analysis(self, cr, uid, ids, context=None):
+        '''        
+        '''
+        return True
+    def remove_analysis(self, cr, uid, ids, context=None):
+        '''        
+        '''
+        return True
+        
     _columns = {
         'analysis_required': fields.boolean('Anal. req.', 
             help='If checked the analysis is printed in the quotation'),
