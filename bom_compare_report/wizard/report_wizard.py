@@ -40,16 +40,15 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-
-class ModuleWizard(orm.TransientModel):
-    ''' Wizard for
+class BomCompareReportWizard(orm.TransientModel):
+    ''' Wizard for compare bom component
     '''
-    _name = 'module.wizard'
+    _name = 'bom.compare.report.wizard'
 
     # --------------------
     # Wizard button event:
     # --------------------
-    def action_done(self, cr, uid, ids, context=None):
+    def action_print(self, cr, uid, ids, context=None):
         ''' Event for button done
         '''
         if context is None: 
@@ -57,24 +56,13 @@ class ModuleWizard(orm.TransientModel):
         
         wizard_browse = self.browse(cr, uid, ids, context=context)[0]
         
-        return {
-            'type': 'ir.actions.act_window_close'
+        return {            
             }
 
     _columns = {
-        'product_id': fields.many2one(
-            'product.product', 'Product', 
-            help='Product selected in sale order line'),
-        'note': fields.text(
-            'Annotation',
-            help='Annotation about production opened with selected product'),
+        'bom_ids': fields.many2many(
+            'mrp.bom', 'mrp_bom_wizard_rel', 
+            'bom_id', 'wizard_id',
+            'BOM'),
         }
-        
-    _defaults = {
-        'product_id': lambda s, cr, uid, c: s.default_product_id(cr, uid, context=c),
-        'note': lambda s, cr, uid, c: s.default_note(cr, uid, context=c),
-        }    
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-
-
