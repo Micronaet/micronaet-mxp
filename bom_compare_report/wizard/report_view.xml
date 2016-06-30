@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-       <!-- module.wizard -->
-       <record id="_wizard_view" model="ir.ui.view">
-            <field name="name"></field>
-            <field name="model">.wizard</field>
+       <!-- bom.compare.report.wizard -->
+       <record id="bom_compare_report_wizard_view" model="ir.ui.view">
+            <field name="name">Wizard BOM compare</field>
+            <field name="model">bom.compare.report.wizard</field>
             <field name="arch" type="xml">
                 <form string="Wizard" version="7.0">
                    <header>
@@ -12,18 +12,28 @@
                        <button name="action_print" string="Print" type="object" icon="gtk-jump-to" class="oe_highlight" />
                    </header>                   
                    <group colspan="4" col="4">
-                        <field name="bom_ids" />
+                        <field name="bom_code" />
+                        <newline/>
+                        <separator string="BOM list:" colspan="4"/>
+                        <field name="bom_ids" colspan="4" nolabel="1"/> <!--widget="many2many_tags"-->
                    </group>
                 </form>
             </field>
       </record>
-      <record model="ir.actions.act_window" id="action_wizard_form">
-          <field name="name"></field>
-          <field name="res_model">.wizard</field>
+      <record model="ir.actions.act_window" id="action_bom_compare_report_wizard">
+          <field name="name">BOM compare wizard</field>
+          <field name="res_model">bom.compare.report.wizard</field>
           <field name="view_type">form</field>
           <field name="view_mode">form</field>
           <field name="target">new</field>
-          <field name="view_id" ref="_wizard_view"/>
+          <field name="view_id" ref="bom_compare_report_wizard_view"/>
       </record>
+      <menuitem 
+          parent="mrp.menu_mrp_configuration" 
+          id="menu_action_bom_compare_report_wizard" 
+          action="action_bom_compare_report_wizard"
+          sequence="50"
+          />
+      
     </data>
 </openerp>

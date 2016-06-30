@@ -60,9 +60,9 @@ class BomCompareReportWizard(orm.TransientModel):
             }
 
     _columns = {
+        'bom_code': fields.char('Part code', size=40),
         'bom_ids': fields.many2many(
             'mrp.bom', 'mrp_bom_wizard_rel', 
-            'bom_id', 'wizard_id',
-            'BOM'),
+            'bom_id', 'wizard_id', 'BOM'),
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

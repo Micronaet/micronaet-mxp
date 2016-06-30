@@ -35,7 +35,7 @@
     'demo': [],
     'data': [
         'report/compare_bom_report.xml',
-        'wizard/report_view.xml_view.xml',
+        'wizard/report_view.xml',
         ],
     'active': False,
     'installable': True,
