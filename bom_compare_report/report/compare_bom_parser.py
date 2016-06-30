@@ -97,6 +97,8 @@ class Parser(report_sxw.rml_parse):
                 continue
             # Col part:
             self.extract_bom.append(bom)
+            #self.filter_description += '[%s] ' % (
+            #    bom.product_id.default_code or bom.name or '???')
                     
         # Sort operations:            
         self.extract_component.sort(
@@ -122,7 +124,11 @@ class Parser(report_sxw.rml_parse):
         elif mode == 'bom':
             return self.extract_bom
         elif mode == 'key':
-            return self.extract_data.get(key, '')
+            value = self.extract_data.get(key, '')
+            if value:
+                return '%10.6f' % value
+            else:
+                return value
         return '?'
         
 
