@@ -12,10 +12,10 @@
                        <button name="action_print" string="Print" type="object" icon="gtk-jump-to" class="oe_highlight" />
                    </header>                   
                    <group colspan="4" col="4">
-                        <field name="bom_code" />
-                        <newline/>
+                        <!--<field name="bom_code" />
+                        <newline/>-->
                         <separator string="BOM list:" colspan="4"/>
-                        <field name="bom_ids" colspan="4" nolabel="1"/> <!--widget="many2many_tags"-->
+                        <field name="bom_ids" colspan="4" nolabel="1"/><!--widget="many2many_tags"-->
                    </group>
                 </form>
             </field>

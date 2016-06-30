@@ -54,15 +54,22 @@ class BomCompareReportWizard(orm.TransientModel):
         if context is None: 
             context = {}        
         
-        wizard_browse = self.browse(cr, uid, ids, context=context)[0]
+        wiz_browse = self.browse(cr, uid, ids, context=context)[0]
+        report_name = 'bom_compare_report'
         
-        return {            
+        datas = {}
+        datas['bom_ids'] = [item.id for item in wiz_browse.bom_ids]
+        
+        return {
+            'type': 'ir.actions.report.xml',
+            'report_name': report_name,
+            'datas': datas,
             }
 
     _columns = {
         'bom_code': fields.char('Part code', size=40),
         'bom_ids': fields.many2many(
             'mrp.bom', 'mrp_bom_wizard_rel', 
-            'bom_id', 'wizard_id', 'BOM'),
+            'bom_id', 'wizard_id', 'BOM', required=True),
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
