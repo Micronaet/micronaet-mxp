@@ -86,7 +86,7 @@ class Parser(report_sxw.rml_parse):
                 # Row part:
                 if component not in self.extract_component:
                     self.extract_component.append(component)
-                
+
                 # Cell part:
                 key = (bom.id, component.id)
                 if key not in self.extract_data:
@@ -95,12 +95,12 @@ class Parser(report_sxw.rml_parse):
                     self.extract_data[key] += component.product_qty        
         return ''
    
-    def get_filter_description(self, ):
+    def get_filter_description(self):
         ''' Return text extract during load data
         '''
         return self.filter_description
     
-    def get_data(self, mode, key=False, data=False):
+    def get_data(self, mode, key=False):
         ''' Return 3 data type:
             1. component for row
             2. bom from columns
@@ -111,7 +111,7 @@ class Parser(report_sxw.rml_parse):
         elif mode == 'bom':
             return self.extract_bom
         elif mode == 'key':
-            return self.extract_data.get(key, 0)
+            return self.extract_data.get(key, '')
         return '?'
         
 
