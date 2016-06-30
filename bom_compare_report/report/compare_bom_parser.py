@@ -84,11 +84,12 @@ class Parser(report_sxw.rml_parse):
             for component in bom.bom_lines:
                 has_component = True
                 # Row part:
-                if component not in self.extract_component:
-                    self.extract_component.append(component)
+                product = component.product_id
+                if product not in self.extract_component:
+                    self.extract_component.append(product)
 
                 # Cell part:
-                key = (bom.id, component.id)
+                key = (bom.id, product.id)
                 if key not in self.extract_data:
                     self.extract_data[key] = component.product_qty
                 else: # append if double    
@@ -102,7 +103,7 @@ class Parser(report_sxw.rml_parse):
                     
         # Sort operations:            
         self.extract_component.sort(
-            key=lambda x: x.product_id.default_code or '?')            
+            key=lambda x: x.default_code or '?')            
 
         self.extract_bom.sort(
             key=lambda x: x.product_id.default_code or x.name or '?')            
