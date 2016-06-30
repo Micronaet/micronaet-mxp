@@ -95,11 +95,11 @@ class Parser(report_sxw.rml_parse):
             2. bom from columns
             3. key for cells key element (passed as key value)
         '''
-        if name == 'component':
+        if mode == 'component':
             return self.extract_component
-        elif name == 'bom':
+        elif mode == 'bom':
             return self.extract_bom
-        elif name == 'key':
+        elif mode == 'key':
             return self.extract_data.get(key, 0)
         return '?'
         
