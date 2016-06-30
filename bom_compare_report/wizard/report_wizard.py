@@ -48,6 +48,40 @@ class BomCompareReportWizard(orm.TransientModel):
     # --------------------
     # Wizard button event:
     # --------------------
+    def load_bom_filter(self, cr, uid, ids, context=None):
+        ''' Load elements depend on code filter
+        '''
+        wiz_proxy = self.browse(cr, uid, ids, context=context)[0]
+        bom_code = wiz_proxy.bom_code
+        if not bom_code:
+            raise osv.except_osv(
+                _('Error'),
+                _('Choose part of code before load BOMs!'),
+                )
+        bom_proxy = self.pool.get('mrp.bom')   
+        bom_ids = bom_proxy.search(cr, uid, [
+            ('product_id.default_code', 'ilike', bom_code)], context=context)
+            
+        # TODO merge with yet present!!!    
+        self.write(cr, uid, ids, {
+            'bom_ids': [(6, 0, bom_ids)],
+            }, context=context)
+            
+        return { # reload form:
+            'type': 'ir.actions.act_window',
+            #'name': _('Result for view_name'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': ids[0],
+            'res_model': 'bom.compare.report.wizard',
+            #'view_id': view_id, # False
+            'views': [(False, 'form')],
+            #'domain': [(')],
+            'context': context,
+            'target': 'new', # 'new'
+            'nodestroy': False,
+            }
+        
     def action_print(self, cr, uid, ids, context=None):
         ''' Event for button done
         '''
@@ -70,6 +104,6 @@ class BomCompareReportWizard(orm.TransientModel):
         'bom_code': fields.char('Part code', size=40),
         'bom_ids': fields.many2many(
             'mrp.bom', 'mrp_bom_wizard_rel', 
-            'bom_id', 'wizard_id', 'BOM', required=True),
+            'bom_id', 'wizard_id', 'BOM'),# required=True),
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

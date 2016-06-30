@@ -13,9 +13,11 @@
                    </header>                   
                    <group colspan="4" col="4">
                         <field name="bom_code" />
+                        <button name="load_bom_filter" string="Load" type="object" icon="gtk-jump-to" class="oe_highlight" />
+                        
                         <newline/>
                         <separator string="BOM list:" colspan="4"/>
-                        <field name="bom_ids" colspan="4" nolabel="1" domain="[('bom_id', '=', False)]"/><!--widget="many2many_tags"-->
+                        <field name="bom_ids" colspan="4" nolabel="1" domain="[('bom_id', '=', False)]"/><!--widget="many2many_tags" attrs="{'invisible':[('bom_code','=',False)]}"-->
                    </group>
                 </form>
             </field>
