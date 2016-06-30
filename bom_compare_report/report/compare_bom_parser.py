@@ -80,8 +80,19 @@ class Parser(report_sxw.rml_parse):
         # Pool used:
         bom_pool = self.pool.get('mrp.bom')
         for bom in bom_pool.browse(cr, uid, bom_ids, context=context):
-            pass # TODO
-        
+            # Col part:
+            self.extract_bom.append(bom)
+            for component in bom.bom_lines:
+                # Row part:
+                if component not in self.extract_component:
+                    self.extract_component.append(component)
+                
+                # Cell part:
+                key = (bom.id, component.id)
+                if key not in self.extract_data:
+                    self.extract_data[key] = component.product_qty
+                else: # append if double    
+                    self.extract_data[key] += component.product_qty        
         return ''
    
     def get_filter_description(self, ):
