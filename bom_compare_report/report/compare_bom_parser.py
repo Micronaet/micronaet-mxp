@@ -46,6 +46,67 @@ class Parser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
         super(Parser, self).__init__(cr, uid, name, context)
         self.localcontext.update({
+            'get_date': self.get_date, # get date
+
+            'load_data': self.load_data,
+            'get_filter_description': self.get_filter_description,            
+            'get_data': self.get_data,
         })
+        
+    def load_data(self, data):
+        ''' Load data for report
+        '''
+        # ---------------------------------------------------------------------
+        #                           Get parameters:
+        # ---------------------------------------------------------------------
+        cr = self.cr
+        uid = self.uid
+        context = {}
+        
+        data = data or {}
+        bom_ids = data.get('bom_ids', [])
+        
+        # ---------------------------------------------------------------------
+        #                          Create structure:
+        # ---------------------------------------------------------------------
+        self.filter_description = ''
+        self.extract_component = [] # row
+        self.extract_bom = [] # col        
+        self.extract_data = {} # cell
+        
+        # ---------------------------------------------------------------------
+        #                           Populate data:
+        # ---------------------------------------------------------------------
+        # Pool used:
+        bom_pool = self.pool.get('mrp.bom')
+        for bom in bom_pool.browse(cr, uid, bom_ids, context=context):
+            pass # TODO
+        
+        return ''
+   
+    def get_filter_description(self, ):
+        ''' Return text extract during load data
+        '''
+        return self.filter_description
+    
+    def get_data(self, mode, key=False, data=False):
+        ''' Return 3 data type:
+            1. component for row
+            2. bom from columns
+            3. key for cells key element (passed as key value)
+        '''
+        if name == 'component':
+            return self.extract_component
+        elif name == 'bom':
+            return self.extract_bom
+        elif name == 'key':
+            return self.extract_data.get(key, 0)
+        return '?'
+        
+
+    def get_date(self):
+        ''' Return datetime obj
+        '''
+        return datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
