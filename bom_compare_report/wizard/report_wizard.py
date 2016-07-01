@@ -48,6 +48,28 @@ class BomCompareReportWizard(orm.TransientModel):
     # --------------------
     # Wizard button event:
     # --------------------
+    def reset_bom_filter(self, cr, uid, ids, context=None):
+        ''' 
+        '''
+        self.write(cr, uid, ids, {
+            'bom_ids': [(6, 0, ())],
+            }, context=context)
+
+        return { # reload form:
+            'type': 'ir.actions.act_window',
+            #'name': _('Result for view_name'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': ids[0],
+            'res_model': 'bom.compare.report.wizard',
+            #'view_id': view_id, # False
+            'views': [(False, 'form')],
+            #'domain': [(')],
+            'context': context,
+            'target': 'new', # 'new'
+            'nodestroy': False,
+            }
+        
     def load_bom_filter(self, cr, uid, ids, context=None):
         ''' Load elements depend on code filter
         '''
@@ -61,7 +83,12 @@ class BomCompareReportWizard(orm.TransientModel):
         bom_proxy = self.pool.get('mrp.bom')   
         bom_ids = bom_proxy.search(cr, uid, [
             ('product_id.default_code', 'ilike', bom_code)], context=context)
-            
+
+        # Add recor yet present:
+        for item in wiz_proxy.bom_ids:
+            if item.id not in bom_ids:
+                bom_ids.append(item.id)
+                
         # TODO merge with yet present!!!    
         self.write(cr, uid, ids, {
             'bom_ids': [(6, 0, bom_ids)],

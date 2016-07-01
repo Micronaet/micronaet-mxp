@@ -98,7 +98,7 @@ class Parser(report_sxw.rml_parse):
                 continue
             # Col part:
             self.extract_bom.append(bom)
-            #self.filter_description += '[%s] ' % (
+            # self.filter_description += '[%s] ' % (
             #    bom.product_id.default_code or bom.name or '???')
                     
         # Sort operations:            

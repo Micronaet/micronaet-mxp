@@ -14,6 +14,7 @@
                    <group colspan="4" col="4">
                         <field name="bom_code" />
                         <button name="load_bom_filter" string="Load" type="object" icon="gtk-jump-to" class="oe_highlight" />
+                        <button name="reset_bom_filter" string="Reset" type="object" icon="gtk-refresh" />
                         
                         <newline/>
                         <separator string="BOM list:" colspan="4"/>
