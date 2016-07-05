@@ -6,7 +6,7 @@
             <field name="model">mrp.bom</field>
             <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
             <field name="arch" type="xml">
-                <field name="after" position="type">
+                <field name="type" position="after">
                     <field name="from_bom_id"/>
                     <button name="load_from_parent" string="Load from parent" type="object" icon="gtk-refresh" attrs="{'invisible':[('from_bom_id','=',False)]}" confirm="Load will delete current bom and populate with parent elements"/>
                 </field>                
