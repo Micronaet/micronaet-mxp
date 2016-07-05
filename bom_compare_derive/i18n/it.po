@@ -1,0 +1,50 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* bom_compare_derive
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 7.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-05 12:21+0000\n"
+"PO-Revision-Date: 2016-07-05 14:24+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: bom_compare_derive
+#: view:mrp.bom:0 field:mrp.bom,derived_ids:0
+msgid "Derived BOM"
+msgstr "Distinte derivate"
+
+#. module: bom_compare_derive
+#: view:mrp.bom:0
+msgid "Load will delete current bom and populate with parent elements"
+msgstr ""
+"Il caricamento cancellerà gli attuali componenti per reinizializzare il "
+"tutto come dalla distinta impostata come partenza"
+
+#. module: bom_compare_derive
+#: view:mrp.bom:0
+msgid "Derived bom"
+msgstr "Distinte derivate"
+
+#. module: bom_compare_derive
+#: model:ir.model,name:bom_compare_derive.model_mrp_bom
+msgid "Bill of Material"
+msgstr "Distinta Base"
+
+#. module: bom_compare_derive
+#: view:mrp.bom:0
+msgid "Load from parent"
+msgstr "Carica da distinta origine"
+
+#. module: bom_compare_derive
+#: field:mrp.bom,from_bom_id:0
+msgid "From BOM"
+msgstr "Distinta origine"
