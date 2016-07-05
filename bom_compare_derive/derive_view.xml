@@ -10,8 +10,27 @@
                     <field name="from_bom_id"/>
                     <button name="load_from_parent" colspan="2" string="Load from parent" type="object" icon="gtk-refresh" attrs="{'invisible':[('from_bom_id','=',False)]}" confirm="Load will delete current bom and populate with parent elements"/>
                 </field>                
+                <xpath expr="//page" position="after">
+                    <page string="Derived BOM"> <!-- attrs="{'invisible':[('derived_ids','=',False)]}"-->
+                        <group colspan="4" col="4">
+                            <separator string="Derived bom" readonly="1" colspan="4"/>
+                            <field name="derived_ids" nolabel="1" colspan="4">                            
+                            </field>
+                        </group>    
+                    </page>
+                </xpath>    
             </field>
         </record>
+        <record model="ir.ui.view" id="view_mrp_bom_derived_tree">
+            <field name="name">mrp.bom.form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_component_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="routing_id" position="after">
+                    <field name="from_bom_id" />
+                </field>
+            </field>
+        </record>    
     </data>
 </openerp>
 
