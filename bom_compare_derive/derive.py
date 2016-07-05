@@ -49,6 +49,7 @@ class MrpBomDerived(osv.osv):
     def load_from_parent(self, cr, uid, ids, context=None):
         ''' Load from parent
         '''
+        # TODO write procedure for load
         return True
              
     _columns = {
