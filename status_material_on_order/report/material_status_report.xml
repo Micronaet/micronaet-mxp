@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<openerp>
+<data noupdate="1">
+    <record id="aeroo_status_material_on_order_report_id" model="ir.actions.report.xml">
+        <field name="name">Status material on order</field>
+        <field name="type">ir.actions.report.xml</field>
+        <field name="model">product.product</field>
+        <field name="report_name">status_material_on_order_report</field>
+        <field name="report_type">aeroo</field>
+        <field name="in_format">oo-odt</field>
+        <field name="parser_loc">status_material_on_order/report/material_status_parser.py</field>
+        <field name="report_rml">status_material_on_order/report/material_status.odt</field>
+        <field name="parser_state">loc</field>
+        <field name="tml_source">file</field>
+    </record>
+    <ir_set>
+        <field eval="'action'" name="key"/>
+        <field eval="'client_print_multi'" name="key2"/>
+        <field eval="['product.product']" name="models"/>
+        <field name="name">Status material on order</field>
+        <field eval="'ir.actions.report.xml,'+str(aeroo_status_material_on_order_report_id)" name="value"/>
+        <field eval="True" name="isobject"/>
+        <field eval="True" name="replace"/>
+    </ir_set>
+</data>
+</openerp>
