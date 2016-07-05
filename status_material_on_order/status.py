@@ -162,12 +162,8 @@ class ProductProduct(orm.Model):
                         'NCF_CONV'] else 1.0)
                 if material_id not in materials:
                     _logger.warning('Product not present in DB? (%s)' % code)                    
-                    pass
-                    
+                    pass                    
                 materials[material_id][0] += qty
-                else:
-                    products[product_id] += qty
-
         return materials        
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

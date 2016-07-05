@@ -52,5 +52,13 @@ class Parser(report_sxw.rml_parse):
     def get_data(self, data):
         ''' Load data for report
         '''
-        return []
+        # Readability:
+        cr = self.cr
+        uid = self.uid
+        context = {}
+        
+        product_pool = self.pool.get('product.product')
+        return  product_pool.get_stock_status_depend_on_order(
+            cr, uid, [], context=context)
+        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
