@@ -53,7 +53,7 @@ class MrpBomDerived(osv.osv):
              
     _columns = {
         'from_bom_id': fields.many2one(
-            'mrp.bom', 'From BOM'), 
+            'mrp.bom', 'From BOM', domain=[('bom_id', '=', False)]), 
         }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
