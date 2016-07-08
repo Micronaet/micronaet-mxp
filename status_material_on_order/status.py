@@ -156,7 +156,15 @@ class ProductProduct(orm.Model):
         
         # Only active from accounting
         line_ids = order_line_pool.search(cr, uid, [
-            ('product_id', 'in', product_ids), # filter only for select prod.
+            ('product_id', 'in', product_ids),
+            ('accounting_order', '=', True), # TODO remove
+            ('order_id.state', 'not in', (
+                'cancel', 
+                #'draft', # TODO remove when operative
+                #'sent'
+                ), 
+            )
+             # filter only for select prod.
             ], context=context)
         for line in order_line_pool.browse(cr, uid, line_ids):
             #if line.product_id.not_in_status: # XXX jump line?
