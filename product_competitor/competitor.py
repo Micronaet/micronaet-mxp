@@ -48,7 +48,7 @@ class ProductProductCompetitor(orm.Model):
     
     _columns = {
         'name': fields.char('Name', size=64, required=True),
-        'default_code': fields.char('Name', size=64),
+        'default_code': fields.char('Code', size=32),
         'note': fields.text('Note'),
         'partner_id': fields.many2one('res.partner', 'Competitor', 
             domain=[('competitor', '=', True)]), 
@@ -64,6 +64,10 @@ class ProductProductCompetitorRel(orm.Model):
     _columns = {
         'competitor_id': fields.many2one('product.product.competitor', 
             'Competitor product'),
+        'competitor_partner_id': fields.related(
+            'competitor_id', 'partner_id', type='many2one', 
+            relation='res.partner', string='Competitor', readonly='1', 
+            store=False),
         'product_id': fields.many2one('product.product', 'Competitor'), 
         'note': fields.text('Note'),
         }
@@ -80,7 +84,7 @@ class ProductProduct(orm.Model):
         }
     
 class ProductProductCompetitor(orm.Model):
-    """ Model name: ProductProducCopetitors
+    """ Model name: ProductProductCompetitors
     """    
     _inherit = 'product.product.competitor'
     

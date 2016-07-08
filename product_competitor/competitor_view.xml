@@ -6,7 +6,7 @@
              <field name="model">res.partner</field>
              <field name="inherit_id" ref="base.view_partner_form"/>
              <field name="arch" type="xml">
-                 <field name="is_company" position="after">
+                 <field name="phone" position="before">
                      <field name="competitor"/>
                  </field>
                  <xpath expr="//notebook/page[2]" position="after">
@@ -22,6 +22,70 @@
                          </group>
                      </page>
                  </xpath>
+             </field>
+         </record>
+         <record model="ir.ui.view" id="view_product_product_form">
+             <field name="name">product.product.form</field>
+             <field name="model">product.product</field>
+             <field name="inherit_id" ref="product.product_normal_form_view"/>
+             <field name="arch" type="xml">
+                 <xpath expr="//notebook/page[2]" position="after">
+                 
+                     <page string="Competitor">
+                         <group col="4" colspan="4">
+                             <field name="competitor_ids" nolabel="1" colspan="4"> 
+                                 <tree string="Competitor product:" editable="bottom">
+                                     <field name="competitor_id"/>
+                                     <!-->field name="partner_id"/>-->
+                                     <field name="note"/>
+                                 </tree>
+                             </field>
+                         </group>
+                     </page>                 
+                 </xpath>
+             </field>
+         </record>
+
+         <!--product.product.competitor-->
+         <record model="ir.ui.view" id="view_product_product_competitor_form">
+             <field name="name">product.product.competitor.form</field>
+             <field name="model">product.product.competitor</field>
+             <field name="arch" type="xml">
+                 <form string="Competitor product" version="7.0">        
+                     <sheet>
+                         <group col="4" colspan="4">
+                             <field name="name" />
+                             <field name="default_code" />
+                             <field name="partner_id" />
+                             <notebook colspan="4">
+                                <!--<page string="Company product:">
+                                     <group col="4" colspan="4">
+                                         <separator string="Product" colspan="4"/>
+                                         <field name="product_ids" nolabel="1" colspan="4"/>
+                                     </group>
+                                 </page>-->
+                                <page string="Note">
+                                     <group col="4" colspan="4">
+                                         <separator string="Note" colspan="4"/>
+                                         <field name="note" nolabel="1" colspan="4"/>
+                                     </group>
+                                 </page>
+                             </notebook>
+                         </group>
+                     </sheet>        
+                 </form>
+             </field>
+         </record>
+
+         <record model="ir.ui.view" id="view_product_product_competitor_tree">
+             <field name="name">product.product.competitor.tree</field>
+             <field name="model">product.product.competitor</field>
+             <field name="arch" type="xml">
+                 <tree string="Competitor product" >        
+                     <field name="name" />
+                     <field name="default_code" />
+                     <field name="partner_id" />
+                 </tree>
              </field>
          </record>
     </data>
