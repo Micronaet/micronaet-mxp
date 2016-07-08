@@ -57,7 +57,7 @@ class SaleOrder(orm.Model):
             'type': 'ir.actions.report.xml',
             'report_name': 'status_material_on_order_report',
             'datas': {
-                'object': 'sale.order',
+                #'object': 'sale.order',
                 'product_ids': product_ids,            
                 },
             } 
