@@ -5,6 +5,7 @@ __pycache__/
 #Micronaet:
 *.*~
 *.OD?#
+*.od?#
 
 # C extensions
 *.so
