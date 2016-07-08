@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_product_product_competitor_user,product.product.competitor,model_product_product_competitor,base.group_user,1,1,1,1
+access_product_product_competitor_rel_user,product.product.competitor.rel,model_product_product_competitor_rel,base.group_user,1,1,1,1
+
