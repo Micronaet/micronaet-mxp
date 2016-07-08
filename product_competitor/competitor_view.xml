@@ -62,7 +62,7 @@
                                      <group col="4" colspan="4">
                                          <separator string="Product" colspan="4"/>
                                          <field name="product_ids" nolabel="1" colspan="4">
-                                            <field name="product_id" />
+                                            <field name="product_id"  /><!--TODO not correct-->
                                          </field>
                                      </group>
                                  </page>
