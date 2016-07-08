@@ -83,7 +83,9 @@ class ProductProduct(orm.Model):
         query_pool = self.pool.get('micronaet.accounting')
                 
         # Parameters:
+        # TODO parametrized:
         month_window = 6 # statistic m(x)
+        month_order = 2 # not used for now (filter order)
         
         # ---------------------------------------------------------------------
         #                      Load extra data for report:
@@ -158,6 +160,7 @@ class ProductProduct(orm.Model):
         line_ids = order_line_pool.search(cr, uid, [
             ('product_id', 'in', product_ids),
             ('order_id.accounting_order', '=', True), # TODO remove
+            # TODO add filter for date!!!
             ('order_id.state', 'not in', (
                 'cancel', 
                 #'draft', # TODO remove when operative
@@ -179,7 +182,7 @@ class ProductProduct(orm.Model):
                 _logger.warning('Product without BOM: %s' % (
                     line.product_id.default_code))
                 continue
-                
+
             for material in boms[product_id].bom_lines:
                 materials[material.product_id.id][ # first cell
                     2] -= line.product_uom_qty * material.product_qty
@@ -212,8 +215,7 @@ class ProductProduct(orm.Model):
                         supplier_order['NGL_DOC'],
                         '???' if deadline.startswith('1900') else deadline,
                         qty,     
-                        ))
-                
+                        ))                
         return materials        
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
