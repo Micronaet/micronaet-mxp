@@ -39,15 +39,6 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 _logger = logging.getLogger(__name__)
 
 
-class ResPartner(orm.Model):
-    """ Model name: ResPartner
-    """    
-    _inherit = 'res.partner'
-    
-    _columns = {
-        'competitor': fields.boolean('Competitor', 
-            help='Mark partner as competitor for manage his products'),
-    }
 
 class ProductProductCompetitor(orm.Model):
     """ Model name: ProductProducCopetitors
@@ -79,8 +70,7 @@ class ProductProductCompetitorRel(orm.Model):
 
 class ProductProduct(orm.Model):
     """ Model name: ProductProduct
-    """
-    
+    """    
     _inherit = 'product.product'
     
     _columns = {
@@ -98,6 +88,19 @@ class ProductProductCompetitor(orm.Model):
         'product_ids': fields.one2many(
             'product.product.competitor.rel', 'competitor_id', 
             'Company product'), 
+        }
+
+class ResPartner(orm.Model):
+    """ Model name: ResPartner
+    """    
+    _inherit = 'res.partner'
+    
+    _columns = {
+        'competitor': fields.boolean('Competitor', 
+            help='Mark partner as competitor for manage his products'),
+        'competitor_product_ids': fields.one2many(
+            'product.product.competitor', 'partner_id', 
+            'Competitor product'),             
         }
     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,7 +1,29 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-
+         <record model="ir.ui.view" id="view_res_partner_competitors_form">
+             <field name="name">res.partner.competitor.form</field>
+             <field name="model">res.partner</field>
+             <field name="inherit_id" ref="base.view_partner_form"/>
+             <field name="arch" type="xml">
+                 <field name="is_company" position="after">
+                     <field name="competitor"/>
+                 </field>
+                 <xpath expr="//notebook/page[2]" position="after">
+                     <page string="Competitors" attrs="{'invisible': [('competitor','=',False)]}">
+                         <group colspan="4" col="4">
+                             <field name="competitor_product_ids" nolabel="1" colspan="4"> 
+                                 <tree string="Competitor product:" editable="bottom">
+                                     <field name="name"/>
+                                     <field name="default_code"/>
+                                     <field name="note"/>
+                                 </tree>
+                             </field>
+                         </group>
+                     </page>
+                 </xpath>
+             </field>
+         </record>
     </data>
 </openerp>
 
