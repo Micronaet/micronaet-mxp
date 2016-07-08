@@ -7,7 +7,7 @@
              <field name="inherit_id" ref="sale.view_order_form"/>
              <field name="arch" type="xml">
                  <xpath expr="//notebook" position="after">
-                     <button name="open_material_status_report" string="Status material" type="object" icon="gtk-print"/>     
+                     <button name="open_material_status_report" string="Status material" type="object" icon="gtk-print" class="oe_hignlight"/>     
                  </xpath>
              </field>
          </record>
