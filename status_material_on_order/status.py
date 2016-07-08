@@ -91,8 +91,8 @@ class ProductProduct(orm.Model):
                     materials[material.id] = [
                         material.accounting_qty, # status
                         material.minimum_qty or 0.0,  # min level
-                        material.default_code, # code
                         0.0, # tot used in period (next step will be populate)
+                        material, # save for reach data in report
                         ]
                     codes[material.default_code] = material.id    
             
@@ -110,7 +110,7 @@ class ProductProduct(orm.Model):
             for material in lavoration.bom_material_ids:
                 material_id = material.product_id.id                
                 if material_id in materials:
-                    materials[material_id][3] += material.quantity or 0.0
+                    materials[material_id][2] += material.quantity or 0.0
                 else:
                     pass # warning
         # TODO m(x) change UOM?
