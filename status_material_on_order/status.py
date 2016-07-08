@@ -83,7 +83,7 @@ class ProductProduct(orm.Model):
         query_pool = self.pool.get('micronaet.accounting')
                 
         # Parameters:
-        month_window = 2 # statistic m(x)
+        month_window = 6 # statistic m(x)
         
         # ---------------------------------------------------------------------
         #                      Load extra data for report:
@@ -114,9 +114,12 @@ class ProductProduct(orm.Model):
                     # Used data for materials: 
                     materials[material.id] = [
                         material.accounting_qty, # status
-                        material.minimum_qty or 0.0,  # min level
-                        0.0, # tot used in period (next step will be populate)
-                        material, # save for reach data in report
+                        0.0, # 1. OF
+                        0.0, # 2. OC
+                        0.0, # 3. mat used in period (to be populate)
+                        material.minimum_qty or 0.0,  # 4. min level
+                        material, # 5. save for reach data in report
+                        [], # 6. detail OF
                         ]
                     codes[material.default_code] = material.id    
             
@@ -134,7 +137,7 @@ class ProductProduct(orm.Model):
             for material in lavoration.bom_material_ids:
                 material_id = material.product_id.id                
                 if material_id in materials:
-                    materials[material_id][2] += material.quantity or 0.0
+                    materials[material_id][3] += material.quantity or 0.0
                 else:
                     pass # warning
         # TODO m(x) change UOM?
@@ -154,7 +157,7 @@ class ProductProduct(orm.Model):
             product_id = line.product_id.id
             if product_id in materials: # material direct sell
                 materials[product_id][
-                    0] -= line.product_uom_qty
+                    2] -= line.product_uom_qty
                 continue
 
             if product_id not in boms:
@@ -164,7 +167,7 @@ class ProductProduct(orm.Model):
                 
             for material in boms[product_id].bom_lines:
                 materials[material.product_id.id][ # first cell
-                    0] -= line.product_uom_qty * material.product_qty
+                    2] -= line.product_uom_qty * material.product_qty
 
         # ---------------------
         # 2. (+) OF lines data:
@@ -184,7 +187,18 @@ class ProductProduct(orm.Model):
                     1.0 / supplier_order['NCF_CONV'] if supplier_order[
                         'NCF_CONV'] else 1.0)
                 
-                materials[material_id][0] += qty
+                materials[material_id][1] += qty
+                deadline = supplier_order['DTT_SCAD'].strftime(
+                            DEFAULT_SERVER_DATE_FORMAT)
+                materials[material_id][6].append(
+                    _('%s / %s / %s (il %s) tot.: %s') % (
+                        supplier_order['CSG_DOC'],
+                        supplier_order['NGB_SR_DOC'],
+                        supplier_order['NGL_DOC'],
+                        '???' if deadline.startswith('1900') else deadline,
+                        qty,     
+                        ))
+                
         return materials        
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
