@@ -88,7 +88,10 @@ class ProductProduct(orm.Model):
         # ---------------------------------------------------------------------
         #                      Load extra data for report:
         # ---------------------------------------------------------------------
-        # 1. Minimum for product and default code database
+
+        # ---------------------------------------------
+        # Minimum for product and default code database
+        # ---------------------------------------------
         materials = {} # XXX Master dict for status!
         codes = {} 
 
@@ -97,7 +100,9 @@ class ProductProduct(orm.Model):
         else:    
             product_ids = product_pool.search(cr, uid, [], context=context)
 
+        # -------
         # 2. BOM:
+        # -------
         boms = {}        
         bom_ids = bom_pool.search(cr, uid, [
             ('bom_id', '=', False), # parent bom
@@ -122,16 +127,18 @@ class ProductProduct(orm.Model):
                         [], # 6. detail OF
                         ]
                     codes[material.default_code] = material.id    
-            
 
-        # 3. Get material m(x) for production of selected product:
+        # ---------------------------------------------------------------------
+        # Get material m(x) for production of selected product:
+        # ---------------------------------------------------------------------
         from_date = (datetime.now() - timedelta(
             days=30 * month_window)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         lavoration_material_ids = lavoration_pool.search(cr, uid, [
             ('real_date_planned', '>=', from_date),
             ('product', 'in', product_ids), # filter for selected product
-            ('state', 'in', ('done', 'startworking')), # started or closed
+            ('state', 'in', ('draft', 'done', 'startworking')), # status check
             ], context=context)
+            
         for lavoration in lavoration_pool.browse(
                 cr, uid, lavoration_material_ids, context=context):
             for material in lavoration.bom_material_ids:
@@ -142,9 +149,9 @@ class ProductProduct(orm.Model):
                     pass # warning
         # TODO m(x) change UOM?
 
-        # ----------------------------------------
-        # 1. (+) component for order line product:
-        # ----------------------------------------
+        # ---------------------------------------------------------------------
+        # (+) component for order line product:
+        # ---------------------------------------------------------------------
         order_line_pool = self.pool.get('sale.order.line')
         
         # Only active from accounting
@@ -169,9 +176,9 @@ class ProductProduct(orm.Model):
                 materials[material.product_id.id][ # first cell
                     2] -= line.product_uom_qty * material.product_qty
 
-        # ---------------------
-        # 2. (+) OF lines data:
-        # ---------------------
+        # ---------------------------------------------------------------------
+        # (+) OF lines data:
+        # ---------------------------------------------------------------------
         cursor_of = query_pool.get_of_line_quantity_deadline(cr, uid)
         if not cursor_of: # no order status insert!
             _logger.error('Error access OF line table in accounting!')                
