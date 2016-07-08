@@ -58,12 +58,14 @@
                              <field name="default_code" />
                              <field name="partner_id" />
                              <notebook colspan="4">
-                                <!--<page string="Company product:">
+                                <page string="Company product:">
                                      <group col="4" colspan="4">
                                          <separator string="Product" colspan="4"/>
-                                         <field name="product_ids" nolabel="1" colspan="4"/>
+                                         <field name="product_ids" nolabel="1" colspan="4">
+                                            <field name="product_id" />
+                                         </field>
                                      </group>
-                                 </page>-->
+                                 </page>
                                 <page string="Note">
                                      <group col="4" colspan="4">
                                          <separator string="Note" colspan="4"/>
