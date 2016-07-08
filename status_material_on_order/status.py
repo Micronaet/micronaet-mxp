@@ -108,13 +108,17 @@ class ProductProduct(orm.Model):
         boms = {}        
         bom_ids = bom_pool.search(cr, uid, [
             ('bom_id', '=', False), # parent bom
-            ('product_id', 'in', product_ids), # only requested product
+            #('product_id', 'in', product_ids), # only requested product
             ], context=context)
         for bom in bom_pool.browse(cr, uid, bom_ids, context=context):        
-            # Save bom for OC explosion:
-            boms[bom.product_id.id] = bom
+            # Save all bom for OC explosion:
+            product_id = bom.product_id.id
+            boms[product_id] = bom
 
             # Initial setup for masterials:
+            # Load only product_ids materials:
+            if product_id not in product_ids:
+                continue
             for line in bom.bom_lines:
                 material = line.product_id
                 if material.id not in materials:
@@ -152,13 +156,12 @@ class ProductProduct(orm.Model):
         # TODO m(x) change UOM?
 
         # ---------------------------------------------------------------------
-        # (+) component for order line product:
+        # (-) OC lines component in line:
         # ---------------------------------------------------------------------
         order_line_pool = self.pool.get('sale.order.line')
         
         # Only active from accounting
         line_ids = order_line_pool.search(cr, uid, [
-            ('product_id', 'in', product_ids),
             ('order_id.accounting_order', '=', True), # TODO remove
             # TODO add filter for date!!!
             ('order_id.state', 'not in', (
@@ -169,21 +172,26 @@ class ProductProduct(orm.Model):
             )
              # filter only for select prod.
             ], context=context)
-        for line in order_line_pool.browse(cr, uid, line_ids):
+        for line in order_line_pool.browse(cr, uid, line_ids, context=context):
             #if line.product_id.not_in_status: # XXX jump line?
-            #    continue                
-            product_id = line.product_id.id
-            if product_id in materials: # material direct sell
+            #    continue 
+                           
+            # Direct sold:
+            product_id = line.product_id.id            
+            if product_id in materials:
                 materials[product_id][
                     2] -= line.product_uom_qty
                 continue
-
+            
+            # Component sold:
             if product_id not in boms:
                 _logger.warning('Product without BOM: %s' % (
                     line.product_id.default_code))
                 continue
 
             for material in boms[product_id].bom_lines:
+                if material.product_id.id not in materials:
+                    continue # jump component (not required)
                 materials[material.product_id.id][ # first cell
                     2] -= line.product_uom_qty * material.product_qty
 
