@@ -1,7 +1,16 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-
+         <record model="ir.ui.view" id="view_sale_order_status_material_form">
+             <field name="name">sale.order.form</field>
+             <field name="model">sale.order</field>
+             <field name="inherit_id" ref="sale.view_order_form"/>
+             <field name="arch" type="xml">
+                 <xpath expr="//notebook" position="after">
+                     <button name="open_material_status_report" string="Status material" type="object" icon="gtk-print"/>     
+                 </xpath>
+             </field>
+         </record>
     </data>
 </openerp>
 

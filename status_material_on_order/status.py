@@ -38,6 +38,30 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
+class SaleOrder(orm.Model):
+    """ Model name: SaleOrder
+    """    
+    _inherit = 'sale.order'
+    
+    def open_material_status_report(self, cr, uid, ids, context=None):
+        ''' Open report for this products
+        '''
+        order_proxy = self.browse(cr, uid, ids, context=context)[0]
+        
+        product_ids = []
+        for line in order_proxy.order_line:
+            if line.product_id.id not in product_ids:
+                product_ids.append(line.product_id.id)
+                
+        return {
+            'type': 'ir.actions.report.xml',
+            'report_name': 'status_material_on_order_report',
+            'datas': {
+                'object': 'sale.order',
+                'product_ids': product_ids,            
+                },
+            } 
+    
 class ProductProduct(orm.Model):
     """ Model name: ProductProduct
     """    
@@ -131,7 +155,7 @@ class ProductProduct(orm.Model):
             if product_id in materials: # material direct sell
                 materials[product_id][
                     0] -= line.product_uom_qty
-                    continue
+                continue
 
             if product_id not in boms:
                 _logger.warning('Product without BOM: %s' % (
