@@ -59,7 +59,7 @@ class ProductProduct(orm.Model):
         query_pool = self.pool.get('micronaet.accounting')
                 
         # Parameters:
-        month_window = 2 # parameters for m(x)
+        month_window = 2 # statistic m(x)
         
         # ---------------------------------------------------------------------
         #                      Load extra data for report:
@@ -80,21 +80,22 @@ class ProductProduct(orm.Model):
             ('product_id', 'in', product_ids), # only requested product
             ], context=context)
         for bom in bom_pool.browse(cr, uid, bom_ids, context=context):        
+            # Save bom for OC explosion:
+            boms[bom.product_id.id] = bom
+
             # Initial setup for masterials:
             for line in bom.bom_lines:
-                product = line.product_id
-                if product.id not in materials:
+                material = line.product_id
+                if material.id not in materials:
                     # Used data for materials: 
-                    materials[product.id] = [
-                        product.accounting_qty, # status
-                        product.minimum_qty or 0.0,  # min level
-                        product.default_code, # code
+                    materials[material.id] = [
+                        material.accounting_qty, # status
+                        material.minimum_qty or 0.0,  # min level
+                        material.default_code, # code
                         0.0, # tot used in period (next step will be populate)
                         ]
-                    codes[product.default_code] = product.id    
+                    codes[material.default_code] = material.id    
             
-            # Save bom for OC explosion:        
-            boms[bom.product_id.id] = bom
 
         # 3. Get material m(x) for production of selected product:
         from_date = (datetime.now() - timedelta(
@@ -127,17 +128,19 @@ class ProductProduct(orm.Model):
             #if line.product_id.not_in_status: # XXX jump line?
             #    continue                
             product_id = line.product_id.id
-            if product_id not in products:
-                pass # XXX warning?
-            
+            if product_id in materials: # material direct sell
+                materials[product_id][
+                    0] -= line.product_uom_qty
+                    continue
+
             if product_id not in boms:
                 _logger.warning('Product without BOM: %s' % (
                     line.product_id.default_code))
-                pass
+                continue
                 
-            for component in boms[product_id].bom_lines:
-                materials[component.product_id.id][ # first cell
-                    0] -= line.product_uom_qty * component.product_qty
+            for material in boms[product_id].bom_lines:
+                materials[material.product_id.id][ # first cell
+                    0] -= line.product_uom_qty * material.product_qty
 
         # ---------------------
         # 2. (+) OF lines data:
@@ -149,20 +152,14 @@ class ProductProduct(orm.Model):
             for supplier_order in cursor_of: # all open OC
                 code = supplier_order['CKY_ART'].strip()
                 material_id = codes.get(code, False)
-                if not product_id:
-                    _logger.error('Product code not found: %s!' % code)
-                    pass 
-                    
-                # Check only selected product component:
-                if material_id not in materials:
-                    pass 
+                if not material_id or material_id not in materials:
+                    _logger.warning('Material code not found: %s!' % code)
+                    continue 
                     
                 qty = float(supplier_order['NQT_RIGA_O_PLOR'] or 0.0) * (
                     1.0 / supplier_order['NCF_CONV'] if supplier_order[
                         'NCF_CONV'] else 1.0)
-                if material_id not in materials:
-                    _logger.warning('Product not present in DB? (%s)' % code)                    
-                    pass                    
+                
                 materials[material_id][0] += qty
         return materials        
 
