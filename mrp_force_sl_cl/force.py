@@ -38,4 +38,59 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
+class MrpProductionWorkcenterLine(orm.Model):
+    """ Model name: MrpProductionWorkcenterLine
+    """    
+    
+    _inherit = 'mrp.production.workcenter.line'
+
+    # --------------    
+    # Button events:
+    # --------------    
+    def button_re_sent_SL_document(self, cr, uid, ids, context=None):
+        ''' Button for re sent SL document (save file and launch XMLRPC
+            procedure)
+        '''
+        # Pool used:
+        mrp_pool = self.pool.get('mrp.production')
+        
+        # Read parameters:
+        lavoration_browse = self.browse(cr, uid, ids, context=context)[0]
+        file_cl, file_cl_upd, file_sl = mrp_pool.get_interchange_files(
+            cr, uid, parameter, context=context)
+        parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
+
+        # Exrport SL files (without correct stock status)
+        mrp_pool.create_unload_file(
+            cr, uid, file_sl, lavoration_browse, force_stock=False, 
+            context=context)
+
+        # XMLRPC server:
+        mx_server = mrp_pool.get_xmlrpc_sl_cl_server(
+            cr, uid, parameter, context=context)
+
+        if not parameter.production_demo:
+            # ---------------------------------------------------------
+            #               SL for material and package
+            # ---------------------------------------------------------
+            try:
+                accounting_sl_code = mx_server.sprix('SL')
+                _logger.info('SL creation esit: %s' % accounting_sl_code          
+            except:    
+                raise osv.except_osv(
+                _('Import SL error!'),
+                _('XMLRPC error calling import SL procedure'), )                
+
+            # TODO in future used for resend normally with recreation SL code:
+            #lavoration_pool.write(
+            #    cr, uid, [current_lavoration_id], {
+            #        'accounting_sl_code': accounting_sl_code,
+            #        'unload_confirmed': True, 
+            #        # TODO non dovrebbe più servire 
+            #        # Next 'confirm' is for prod.
+            #        },
+            #    context=context)
+        return True
+    
+    
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
