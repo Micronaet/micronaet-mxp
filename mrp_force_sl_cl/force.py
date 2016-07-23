@@ -26,7 +26,7 @@ import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from openerp import SUPERUSER_ID, api
+from openerp import SUPERUSER_ID
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
@@ -55,10 +55,10 @@ class MrpProductionWorkcenterLine(orm.Model):
         mrp_pool = self.pool.get('mrp.production')
         
         # Read parameters:
+        parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
         lavoration_browse = self.browse(cr, uid, ids, context=context)[0]
         file_cl, file_cl_upd, file_sl = mrp_pool.get_interchange_files(
             cr, uid, parameter, context=context)
-        parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
 
         # Exrport SL files (without correct stock status)
         mrp_pool.create_unload_file(
@@ -69,13 +69,18 @@ class MrpProductionWorkcenterLine(orm.Model):
         mx_server = mrp_pool.get_xmlrpc_sl_cl_server(
             cr, uid, parameter, context=context)
 
-        if not parameter.production_demo:
+        if parameter.production_demo:
+            raise osv.except_osv(
+            _('Import SL error!'),
+            _('XMLRPC not launched: DEMO Mode!'), 
+            )
+        else:
             # ---------------------------------------------------------
             #               SL for material and package
             # ---------------------------------------------------------
             try:
                 accounting_sl_code = mx_server.sprix('SL')
-                _logger.info('SL creation esit: %s' % accounting_sl_code          
+                _logger.info('SL creation esit: %s' % accounting_sl_code)
             except:    
                 raise osv.except_osv(
                 _('Import SL error!'),
