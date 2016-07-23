@@ -18,7 +18,7 @@
             <field name="inherit_id" ref="mrp_operations.mrp_production_workcenter_tree_view_inherit"/>
             <field name="arch" type="xml">
                 <field name="state" position="after">
-                    <button name="button_re_send_SL_document" string="Re send SL" type="object" attrs="{'invisible':[('accounting_sl_code', '=', False)]}" icon="gtk-refresk"/>
+                    <button name="button_re_send_SL_document" string="Re send SL" type="object" attrs="{'invisible':[('accounting_sl_code', '=', False)]}" icon="gtk-refresh"/>
                 </field>
             </field>
         </record>
