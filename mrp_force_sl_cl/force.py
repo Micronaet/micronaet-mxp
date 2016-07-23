@@ -80,11 +80,19 @@ class MrpProductionWorkcenterLine(orm.Model):
             # ---------------------------------------------------------
             try:
                 accounting_sl_code = mx_server.sprix('SL')
-                _logger.info('SL creation esit: %s' % accounting_sl_code)
+                if lavoration_browse.accounting_sl_code != accounting_sl_code:
+                    raise osv.except_osv(
+                        _('Different SL document!'),
+                        _('Current SL: %s Accounting: %s') % (
+                            lavoration_browse.accounting_sl_code,
+                            accounting_sl_code,                            
+                            ),
+                        )                    
+                _logger.warning('SL creation esit: %s' % accounting_sl_code)                
             except:    
                 raise osv.except_osv(
-                _('Import SL error!'),
-                _('XMLRPC error calling import SL procedure'), )                
+                    _('Import SL error!'),
+                    _('XMLRPC error calling import SL procedure'), )                
 
             # TODO in future used for resend normally with recreation SL code:
             #lavoration_pool.write(
