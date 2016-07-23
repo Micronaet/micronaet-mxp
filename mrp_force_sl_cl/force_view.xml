@@ -11,6 +11,17 @@
                 </field>
             </field>
         </record>
+                
+        <record model="ir.ui.view" id="view_lavoration_resent_sl_tree">
+            <field name="name">mrp.production.workcenter.line.resend.button.tree</field>
+            <field name="model">mrp.production.workcenter.line</field>
+            <field name="inherit_id" ref="mrp_operations.mrp_production_workcenter_tree_view_inherit"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <button name="button_re_send_SL_document" string="Re send SL" type="object" attrs="{'invisible':[('accounting_sl_code', '=', False)]}" />
+                </field>
+            </field>
+        </record>
     </data>
 </openerp>
 
