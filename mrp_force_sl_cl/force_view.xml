@@ -1,7 +1,16 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-
+        <record model="ir.ui.view" id="view_lavoration_resend_sl_form">
+            <field name="name">mrp.production.workcenter.line.resend.button.form</field>
+            <field name="model">mrp.production.workcenter.line</field>
+            <field name="inherit_id" ref="production_line.default_mrp_production_workcenter_line_view" />
+            <field name="arch" type="xml">
+                <field name="accounting_sl_code" position="after">
+                    <button name="button_re_send_SL_document" string="Re send SL" type="object" attrs="{'invisible':[('accounting_sl_code', '=', False)]}" />
+                </field>
+            </field>
+        </record>
     </data>
 </openerp>
 

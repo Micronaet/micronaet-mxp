@@ -47,7 +47,7 @@ class MrpProductionWorkcenterLine(orm.Model):
     # --------------    
     # Button events:
     # --------------    
-    def button_re_sent_SL_document(self, cr, uid, ids, context=None):
+    def button_re_send_SL_document(self, cr, uid, ids, context=None):
         ''' Button for re sent SL document (save file and launch XMLRPC
             procedure)
         '''

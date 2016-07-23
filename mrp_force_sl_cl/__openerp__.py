@@ -31,6 +31,7 @@
     'depends': [
         'base',
         'production_line',
+        #'mrp_operations',
         ],
     'init_xml': [],
     'demo': [],
