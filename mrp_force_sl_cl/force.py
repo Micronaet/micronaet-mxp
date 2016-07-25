@@ -131,36 +131,103 @@ class MrpProductionWorkcenterLoad(orm.Model):
         mx_server = mrp_pool.get_xmlrpc_sl_cl_server(
             cr, uid, parameter, context=context)
 
-        # Export CL file: TODO
+        # ---------------------------------------------------------------------
+        #                            Export CL file:
+        # ---------------------------------------------------------------------        
+        # Read data from saved lavoration
+        product_qty = load_browse.product_qty
+        line_id = load_browse.line_id.id
+        partial = load_browse.partial
+        package = load_browse.package_id # browse
+        lavoration = load_browse.workcenter_line_id
+        ul_qty = load_browse.ul_qty
+        pallet_product_id = load_browse.pallet_product_id.id
+        pallet_qty = load_browse.pallet_qty
+        recycle = load_browse.recycle
+        recycle_product_id  = load_browse.recycle_product_id.id
+        wrong = load_browse.wrong
+        #wrong_comment = load_browse.wrong_comment
+        sequence = load_browse.sequence
+        product_code = load_browse.product_code
+        accounting_cost = load_browse.unload_cost # price calculated!
+        price = accounting_cost / product_qty        
         
         
+        if not price:
+            raise osv.except_osv(
+                _('Price error!'),
+                _('Price is empty, problem with lavoration non closed!'),
+                )
         
-        
+        # Open transit file:
+        try:
+            f_cl = open(file_cl, 'w')
+        except:
+            raise osv.except_osv(
+                _('Transit file problem accessing!'),
+                _('%s (maybe open in accounting program)!') % file_cl,
+                )
+                
+        if wrong:
+            f_cl.write('%-35s%10.2f%10.2f\r\n' % (
+                '%sR%s' % (
+                    product_code[:7],
+                    product_code[8:],
+                    ),
+                product_qty,
+                price,
+                ))
+        else:
+            f_cl.write('%-35s%10.2f%10.2f\r\n' % (
+                product_code, product_qty, price))
+
+        if package.id and ul_qty:
+            f_cl.write(
+                '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
+                    package.linked_product_id.default_code,
+                    ' ' * 25, #lavoration_browse.name[4:],
+                    - ul_qty,
+                    lavoration.accounting_sl_code,
+                ))
+        else:
+            pass # TODO raise error if no package? (no if wrong!)
+        if pallet and wiz_proxy.pallet_qty:
+            f_cl.write(
+                '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
+                    pallet.default_code,
+                    ' ' * 25, #lavoration_browse.name[4:],
+                    - wiz_proxy.pallet_qty,
+                    lavoration.accounting_sl_code,
+                ))
+        else:
+            pass                
+        f_cl.close()
         
         if parameter.production_demo:
             raise osv.except_osv(
             _('Import CL error!'),
             _('XMLRPC not launched: DEMO Mode!'), 
             )
-        else:
-            # ---------------------------------------------------------
-            #               SL for material and package
-            # ---------------------------------------------------------
-            try:
-                accounting_cl_code = mx_server.sprix('CL')
-                if load_browse.accounting_cl_code != accounting_cl_code:
-                    raise osv.except_osv(
-                        _('Different CL document!'),
-                        _('Current CL: %s Accounting: %s') % (
-                            load_browse.accounting_cl_code,
-                            accounting_cl_code,                            
-                            ),
-                        )                    
-                _logger.warning('CL creation esit: %s' % accounting_cl_code)
-            except:    
+            return 
+
+        # ---------------------------------------------------------------------
+        #               CL for material and package
+        # ---------------------------------------------------------------------
+        try:
+            accounting_cl_code = mx_server.sprix('CL')
+            if load_browse.accounting_cl_code != accounting_cl_code:
                 raise osv.except_osv(
-                    _('Import CL error!'),
-                    _('XMLRPC error calling import CL procedure'), )                
+                    _('Different CL document!'),
+                    _('Current CL: %s Accounting: %s') % (
+                        load_browse.accounting_cl_code,
+                        accounting_cl_code,                            
+                        ),
+                    )                    
+            _logger.warning('CL creation esit: %s' % accounting_cl_code)
+        except:    
+            raise osv.except_osv(
+                _('Import CL error!'),
+                _('XMLRPC error calling import CL procedure'), )                
         return True
     
     
