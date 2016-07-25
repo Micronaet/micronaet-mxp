@@ -105,6 +105,15 @@ class MrpProductionWorkcenterLine(orm.Model):
             #    context=context)
         return True
 
+class MrpProductionWorkcenterLoad(orm.Model):
+    """ Model name: MrpProductionWorkcenterLoad
+    """    
+    
+    _inherit = 'mrp.production.workcenter.load'
+
+    # --------------    
+    # Button events:
+    # --------------    
     def button_re_send_CL_document(self, cr, uid, ids, context=None):
         ''' Button for re sent CL document (save file and launch XMLRPC
             procedure)
@@ -114,20 +123,23 @@ class MrpProductionWorkcenterLine(orm.Model):
         
         # Read parameters:
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
-        lavoration_browse = self.browse(cr, uid, ids, context=context)[0]
+        load_browse = self.browse(cr, uid, ids, context=context)[0]
         file_cl, file_cl_upd, file_sl = mrp_pool.get_interchange_files(
             cr, uid, parameter, context=context)
-
-        # Export CL file: TODO
-        
 
         # XMLRPC server:
         mx_server = mrp_pool.get_xmlrpc_sl_cl_server(
             cr, uid, parameter, context=context)
 
+        # Export CL file: TODO
+        
+        
+        
+        
+        
         if parameter.production_demo:
             raise osv.except_osv(
-            _('Import SL error!'),
+            _('Import CL error!'),
             _('XMLRPC not launched: DEMO Mode!'), 
             )
         else:
@@ -135,13 +147,13 @@ class MrpProductionWorkcenterLine(orm.Model):
             #               SL for material and package
             # ---------------------------------------------------------
             try:
-                accounting_sl_code = mx_server.sprix('CL')
-                if lavoration_browse.accounting_cl_code != accounting_cl_code:
+                accounting_cl_code = mx_server.sprix('CL')
+                if load_browse.accounting_cl_code != accounting_cl_code:
                     raise osv.except_osv(
                         _('Different CL document!'),
                         _('Current CL: %s Accounting: %s') % (
-                            lavoration_browse.accounting_sl_code,
-                            accounting_sl_code,                            
+                            load_browse.accounting_cl_code,
+                            accounting_cl_code,                            
                             ),
                         )                    
                 _logger.warning('CL creation esit: %s' % accounting_cl_code)
