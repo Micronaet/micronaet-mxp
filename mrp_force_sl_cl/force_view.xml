@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <!-- SL -->
         <record model="ir.ui.view" id="view_lavoration_resend_sl_form">
             <field name="name">mrp.production.workcenter.line.resend.button.form</field>
             <field name="model">mrp.production.workcenter.line</field>
@@ -22,6 +23,19 @@
                 </field>
             </field>
         </record>
+
+        <!-- CL -->
+        <record model="ir.ui.view" id="view_lavoration_load_resent_cl_tree">
+            <field name="name">mrp.production.workcenter.load.resend.button.tree</field>
+            <field name="model">mrp.production.workcenter.load</field>
+            <field name="inherit_id" ref="production_line.default_mrp_production_workcenter_load_tree_readonly_view"/>
+            <field name="arch" type="xml">
+                <field name="pallet_qty" position="after">
+                    <button name="button_re_send_CL_document" string="Re send CL" type="object" attrs="{'invisible':[('accounting_cl_code', '=', False)]}" icon="gtk-refresh"/>
+                </field>
+            </field>
+        </record>
+        
     </data>
 </openerp>
 
