@@ -122,6 +122,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
         mrp_pool = self.pool.get('mrp.production')
         
         # Read parameters:
+        import pdb; pdb.set_trace()
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
         load_browse = self.browse(cr, uid, ids, context=context)[0]
         file_cl, file_cl_upd, file_sl = mrp_pool.get_interchange_files(
@@ -136,12 +137,12 @@ class MrpProductionWorkcenterLoad(orm.Model):
         # ---------------------------------------------------------------------        
         # Read data from saved lavoration
         product_qty = load_browse.product_qty
-        line_id = load_browse.line_id.id
+        #line_id = load_browse.line_id.id
         partial = load_browse.partial
         package = load_browse.package_id # browse
-        lavoration = load_browse.workcenter_line_id
+        lavoration = load_browse.line_id #workcenter_line_id
         ul_qty = load_browse.ul_qty
-        pallet_product_id = load_browse.pallet_product_id.id
+        pallet = load_browse.pallet_product_id#.id
         pallet_qty = load_browse.pallet_qty
         recycle = load_browse.recycle
         recycle_product_id  = load_browse.recycle_product_id.id
@@ -149,10 +150,9 @@ class MrpProductionWorkcenterLoad(orm.Model):
         #wrong_comment = load_browse.wrong_comment
         sequence = load_browse.sequence
         product_code = load_browse.product_code
-        accounting_cost = load_browse.unload_cost # price calculated!
+        accounting_cost = load_browse.accounting_cost # price calculated!
         price = accounting_cost / product_qty        
-        
-        
+                
         if not price:
             raise osv.except_osv(
                 _('Price error!'),
@@ -191,12 +191,12 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 ))
         else:
             pass # TODO raise error if no package? (no if wrong!)
-        if pallet and wiz_proxy.pallet_qty:
+        if pallet and pallet_qty: # XXX after was pallet
             f_cl.write(
                 '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
                     pallet.default_code,
                     ' ' * 25, #lavoration_browse.name[4:],
-                    - wiz_proxy.pallet_qty,
+                    - pallet_qty,
                     lavoration.accounting_sl_code,
                 ))
         else:
