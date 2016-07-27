@@ -122,7 +122,6 @@ class MrpProductionWorkcenterLoad(orm.Model):
         mrp_pool = self.pool.get('mrp.production')
         
         # Read parameters:
-        import pdb; pdb.set_trace()
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
         load_browse = self.browse(cr, uid, ids, context=context)[0]
         file_cl, file_cl_upd, file_sl = mrp_pool.get_interchange_files(
