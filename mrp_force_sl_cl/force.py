@@ -144,13 +144,19 @@ class MrpProductionWorkcenterLoad(orm.Model):
         pallet = load_browse.pallet_product_id#.id
         pallet_qty = load_browse.pallet_qty
         recycle = load_browse.recycle
-        recycle_product_id  = load_browse.recycle_product_id.id
+        recycle_product_id = load_browse.recycle_product_id.id
         wrong = load_browse.wrong
         #wrong_comment = load_browse.wrong_comment
         sequence = load_browse.sequence
         product_code = load_browse.product_code
         accounting_cost = load_browse.accounting_cost # price calculated!
-        price = accounting_cost / product_qty        
+        price = accounting_cost / product_qty
+        accounting_cl_code = load_browse.accounting_cl_code      
+        cl_date = '%s%s%s' % (
+            load_browse.date[:4],
+            load_browse.date[5:7],
+            load_browse.date[8:10],
+            )
                 
         if not price:
             raise osv.except_osv(
@@ -166,48 +172,57 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 _('Transit file problem accessing!'),
                 _('%s (maybe open in accounting program)!') % file_cl,
                 )
-                
+        
         if wrong:
-            f_cl.write('%-35s%10.2f%10.2f\r\n' % (
+            f_cl.write('%-35s%10.2f%10.2f%8s%8s\r\n' % (
                 '%sR%s' % (
                     product_code[:7],
                     product_code[8:],
                     ),
                 product_qty,
                 price,
+                accounting_cl_code,
+                cl_date,               
                 ))
         else:
-            f_cl.write('%-35s%10.2f%10.2f\r\n' % (
-                product_code, product_qty, price))
+            f_cl.write('%-35s%10.2f%10.2f%8s%8s\r\n' % (
+                product_code, 
+                product_qty, 
+                price,
+                accounting_cl_code,
+                cl_date,
+                ))
 
         if package.id and ul_qty:
             f_cl.write(
-                '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
+                '%-10s%-25s%10.2f%-10s%16s\r\n' % ( # TODO 10 extra space
                     package.linked_product_id.default_code,
-                    ' ' * 25, #lavoration_browse.name[4:],
+                    '', #lavoration_browse.name[4:],
                     - ul_qty,
                     lavoration.accounting_sl_code,
+                    '',
                 ))
         else:
             pass # TODO raise error if no package? (no if wrong!)
         if pallet and pallet_qty: # XXX after was pallet
             f_cl.write(
-                '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
+                '%-10s%-25s%10.2f%-10s%16s\r\n' % ( # TODO 10 extra space
                     pallet.default_code,
-                    ' ' * 25, #lavoration_browse.name[4:],
+                    '', #lavoration_browse.name[4:],
                     - pallet_qty,
                     lavoration.accounting_sl_code,
+                    '',
                 ))
         else:
             pass                
         f_cl.close()
-        
+
         if parameter.production_demo:
             raise osv.except_osv(
             _('Import CL error!'),
             _('XMLRPC not launched: DEMO Mode!'), 
             )
-            return 
+            return
 
         # ---------------------------------------------------------------------
         #               CL for material and package
