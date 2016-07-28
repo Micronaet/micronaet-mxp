@@ -229,7 +229,6 @@ class MrpProductionWorkcenterLoad(orm.Model):
         # ---------------------------------------------------------------------
         try:
             accounting_cl_code = mx_server.sprix('CL')
-            import pdb; pdb.set_trace()
             if load_browse.accounting_cl_code != accounting_cl_code:
                 raise osv.except_osv(
                     _('Different CL document!'),
