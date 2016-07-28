@@ -174,7 +174,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 )
         
         if wrong:
-            f_cl.write('%-35s%10.2f%10.2f%8s%8s\r\n' % (
+            f_cl.write('%-35s%10.2f%13.5f%8s%8s\r\n' % (
                 '%sR%s' % (
                     product_code[:7],
                     product_code[8:],
@@ -185,7 +185,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 cl_date,               
                 ))
         else:
-            f_cl.write('%-35s%10.2f%10.2f%8s%8s\r\n' % (
+            f_cl.write('%-35s%10.2f%13.5f%8s%8s\r\n' % (
                 product_code, 
                 product_qty, 
                 price,
@@ -195,7 +195,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
 
         if package.id and ul_qty:
             f_cl.write(
-                '%-10s%-25s%10.2f%-10s%16s\r\n' % ( # TODO 10 extra space
+                '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
                     package.linked_product_id.default_code,
                     '', #lavoration_browse.name[4:],
                     - ul_qty,
@@ -206,7 +206,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
             pass # TODO raise error if no package? (no if wrong!)
         if pallet and pallet_qty: # XXX after was pallet
             f_cl.write(
-                '%-10s%-25s%10.2f%-10s%16s\r\n' % ( # TODO 10 extra space
+                '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
                     pallet.default_code,
                     '', #lavoration_browse.name[4:],
                     - pallet_qty,
