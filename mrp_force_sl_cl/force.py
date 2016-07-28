@@ -227,7 +227,6 @@ class MrpProductionWorkcenterLoad(orm.Model):
             raise osv.except_osv(
                 _('Import CL error!'),
                 _('XMLRPC error calling import CL procedure'), )                
-        return True
-    
+        return True    
     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
