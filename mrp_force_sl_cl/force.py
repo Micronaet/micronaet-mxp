@@ -115,7 +115,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
     # Button events:
     # --------------    
     def button_re_send_CL_no_SL_document(self, cr, uid, ids, context=None):
-        if context in None:
+        if context is None:
             context = {}
             
         context['import_only_CL'] = True        
@@ -125,7 +125,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
         ''' Button for re sent CL document (save file and launch XMLRPC
             procedure)
         '''
-        if context in None:
+        if context is None:
             context = {}
 
         # Pool used:
