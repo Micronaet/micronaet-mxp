@@ -114,12 +114,24 @@ class MrpProductionWorkcenterLoad(orm.Model):
     # --------------    
     # Button events:
     # --------------    
+    def button_re_send_CL_no_SL_document(self, cr, uid, ids, context=None):
+        if context in None:
+            context = {}
+            
+        context['import_only_CL'] = True        
+        return self.button_re_send_CL_document(cr, uid, ids, context=context)
+                
     def button_re_send_CL_document(self, cr, uid, ids, context=None):
         ''' Button for re sent CL document (save file and launch XMLRPC
             procedure)
         '''
+        if context in None:
+            context = {}
+
         # Pool used:
         mrp_pool = self.pool.get('mrp.production')
+
+        import_only_CL = context.get('import_only_CL', False)
         
         # Read parameters:
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
@@ -193,7 +205,8 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 cl_date,
                 ))
 
-        if package.id and ul_qty:
+        # SL unload package
+        if not import_only_CL and package.id and ul_qty:
             f_cl.write(
                 '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
                     package.linked_product_id.default_code,
@@ -204,7 +217,8 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 ))
         else:
             pass # TODO raise error if no package? (no if wrong!)
-        if pallet and pallet_qty: # XXX after was pallet
+            
+        if not import_only_CL and pallet and pallet_qty: # XXX after was pallet
             f_cl.write(
                 '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
                     pallet.default_code,
