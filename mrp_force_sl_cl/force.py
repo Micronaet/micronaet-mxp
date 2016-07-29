@@ -132,6 +132,11 @@ class MrpProductionWorkcenterLoad(orm.Model):
         mrp_pool = self.pool.get('mrp.production')
 
         import_only_CL = context.get('import_only_CL', False)
+        if import_only_CL:
+            _logger.warning('Import only CL')
+        else:    
+            _logger.warning('Import CL and SL for materials')            
+            
         
         # Read parameters:
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
