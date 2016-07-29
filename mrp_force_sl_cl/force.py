@@ -158,11 +158,11 @@ class MrpProductionWorkcenterLoad(orm.Model):
             load_browse.date[8:10],
             )
                 
-        if not price:
-            raise osv.except_osv(
-                _('Price error!'),
-                _('Price is empty, problem with lavoration non closed!'),
-                )
+        #if not price:
+        #    raise osv.except_osv(
+        #        _('Price error!'),
+        #        _('Price is empty, problem with lavoration non closed!'),
+        #        )
         
         # Open transit file:
         try:
