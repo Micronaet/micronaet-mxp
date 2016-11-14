@@ -20,9 +20,4 @@
 #
 ###############################################################################
 
-import status_webkit
-import lavoration_parser
-import workcenter_lavoration_parser
-import order_covered_parser
-import bom_parser
-
+import product_status_parser

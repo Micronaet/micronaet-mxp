@@ -18,12 +18,12 @@
 ###############################################################################
 
 {
-    'name': 'One product status',
+    'name': 'Production product status', 
     'version': '0.1',
     'category': 'MRP',
     'description': '''        
         Statistic of production for one product
-        '''
+        ''',
     'author': 'Micronaet S.r.l. - Nicola Riolini',
     'website': 'http://www.micronaet.it',
     'license': 'AGPL-3',
@@ -36,6 +36,7 @@
     'demo': [],
     'data': [
         #'security/ir.model.access.csv',    
+        'report/product_status_report.xml',
         'status_view.xml',
         ],
     'active': False,
