@@ -32,6 +32,7 @@
             <field name="arch" type="xml">
                 <field name="pallet_qty" position="after">
                     <button name="button_re_send_CL_document" string="Re send CL" type="object" attrs="{'invisible':[('accounting_cl_code', '=', False)]}" icon="gtk-refresh"/>
+                    <button name="button_re_send_CL_no_SL_document" string="Re send CL no SL" type="object" attrs="{'invisible':[('accounting_cl_code', '=', False)]}" icon="gtk-jump-to"/>
                 </field>
             </field>
         </record>

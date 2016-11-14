@@ -114,12 +114,29 @@ class MrpProductionWorkcenterLoad(orm.Model):
     # --------------    
     # Button events:
     # --------------    
+    def button_re_send_CL_no_SL_document(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+            
+        context['import_only_CL'] = True        
+        return self.button_re_send_CL_document(cr, uid, ids, context=context)
+                
     def button_re_send_CL_document(self, cr, uid, ids, context=None):
         ''' Button for re sent CL document (save file and launch XMLRPC
             procedure)
         '''
+        if context is None:
+            context = {}
+
         # Pool used:
         mrp_pool = self.pool.get('mrp.production')
+
+        import_only_CL = context.get('import_only_CL', False)
+        if import_only_CL:
+            _logger.warning('Import only CL')
+        else:    
+            _logger.warning('Import CL and SL for materials')            
+            
         
         # Read parameters:
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
@@ -144,19 +161,25 @@ class MrpProductionWorkcenterLoad(orm.Model):
         pallet = load_browse.pallet_product_id#.id
         pallet_qty = load_browse.pallet_qty
         recycle = load_browse.recycle
-        recycle_product_id  = load_browse.recycle_product_id.id
+        recycle_product_id = load_browse.recycle_product_id.id
         wrong = load_browse.wrong
         #wrong_comment = load_browse.wrong_comment
         sequence = load_browse.sequence
         product_code = load_browse.product_code
         accounting_cost = load_browse.accounting_cost # price calculated!
-        price = accounting_cost / product_qty        
+        price = accounting_cost / product_qty
+        accounting_cl_code = load_browse.accounting_cl_code      
+        cl_date = '%s%s%s' % (
+            load_browse.date[:4],
+            load_browse.date[5:7],
+            load_browse.date[8:10],
+            )
                 
-        if not price:
-            raise osv.except_osv(
-                _('Price error!'),
-                _('Price is empty, problem with lavoration non closed!'),
-                )
+        #if not price:
+        #    raise osv.except_osv(
+        #        _('Price error!'),
+        #        _('Price is empty, problem with lavoration non closed!'),
+        #        )
         
         # Open transit file:
         try:
@@ -166,48 +189,59 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 _('Transit file problem accessing!'),
                 _('%s (maybe open in accounting program)!') % file_cl,
                 )
-                
+        
         if wrong:
-            f_cl.write('%-35s%10.2f%10.2f\r\n' % (
+            f_cl.write('%-35s%10.2f%13.5f%8s%8s\r\n' % (
                 '%sR%s' % (
                     product_code[:7],
                     product_code[8:],
                     ),
                 product_qty,
                 price,
+                accounting_cl_code,
+                cl_date,               
                 ))
         else:
-            f_cl.write('%-35s%10.2f%10.2f\r\n' % (
-                product_code, product_qty, price))
+            f_cl.write('%-35s%10.2f%13.5f%8s%8s\r\n' % (
+                product_code, 
+                product_qty, 
+                price,
+                accounting_cl_code,
+                cl_date,
+                ))
 
-        if package.id and ul_qty:
+        # SL unload package
+        if not import_only_CL and package.id and ul_qty:
             f_cl.write(
-                '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
+                '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
                     package.linked_product_id.default_code,
-                    ' ' * 25, #lavoration_browse.name[4:],
+                    '', #lavoration_browse.name[4:],
                     - ul_qty,
                     lavoration.accounting_sl_code,
+                    '',
                 ))
         else:
             pass # TODO raise error if no package? (no if wrong!)
-        if pallet and pallet_qty: # XXX after was pallet
+            
+        if not import_only_CL and pallet and pallet_qty: # XXX after was pallet
             f_cl.write(
-                '%-10s%-25s%10.2f%-10s\r\n' % ( # TODO 10 extra space
+                '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
                     pallet.default_code,
-                    ' ' * 25, #lavoration_browse.name[4:],
+                    '', #lavoration_browse.name[4:],
                     - pallet_qty,
                     lavoration.accounting_sl_code,
+                    '',
                 ))
         else:
             pass                
         f_cl.close()
-        
+
         if parameter.production_demo:
             raise osv.except_osv(
             _('Import CL error!'),
             _('XMLRPC not launched: DEMO Mode!'), 
             )
-            return 
+            return
 
         # ---------------------------------------------------------------------
         #               CL for material and package
@@ -226,7 +260,9 @@ class MrpProductionWorkcenterLoad(orm.Model):
         except:    
             raise osv.except_osv(
                 _('Import CL error!'),
-                _('XMLRPC error calling import CL procedure'), )                
+                _('XMLRPC error calling import CL procedure %s') % (
+                    sys.exc_info(), ), 
+                )                
         return True    
     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
