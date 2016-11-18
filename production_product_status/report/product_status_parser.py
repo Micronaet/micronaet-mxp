@@ -88,7 +88,9 @@ class Parser(report_sxw.rml_parse):
                 ])
                 
             for line in order_line_pool.browse(cr, uid, line_ids):
-                record[1][line.date_deadline] -= line.product_uom_qty or 0.0
+                deadline = line.date_deadline
+                deadline = start_date
+                record[1][deadline] -= line.product_uom_qty or 0.0                    
                 
             # -----------------------------------------------------------------
             #                   Get material list from Lavoration order
