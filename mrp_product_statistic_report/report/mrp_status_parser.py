@@ -87,8 +87,9 @@ class Parser(report_sxw.rml_parse):
 
             # Lavoration Theoric:
             for wc in mrp.workcenter_lines: # Lavoration
-                res[product][0] += wc.product_qty
-                # or sum of materials?
+                res[product][0] += \
+                    sum([m.quantity for m in wc.bom_material_ids])
+                # wc.product_qty # header not better!!!
             
             # CL Real: 
             for cl in mrp.load_ids:
