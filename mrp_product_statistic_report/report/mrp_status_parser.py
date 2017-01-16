@@ -90,6 +90,8 @@ class Parser(report_sxw.rml_parse):
             'Teorica',
             'Effettiva',
             'Recupero',
+            'Resa Teo. / Eff.)',
+            'Recupero Rec. / Eff.)',
             'Anomalia',
             ], 0) # write header
         counter_mrp = 0 # Jump header line
@@ -212,6 +214,8 @@ class Parser(report_sxw.rml_parse):
                 mrp_in, # Q. theoric
                 mrp_out, # Q. real
                 mrp_recycle, # Recycle
+                mrp_in / mrp_out * 100.0 if mrp_out else 0.0,
+                mrp_recycle / mrp_out * 100.0 if mrp_out else 0.0,
                 'X' if mrp_in < mrp_out else '',
                 ], counter_mrp)
     
