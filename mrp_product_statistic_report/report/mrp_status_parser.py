@@ -67,11 +67,33 @@ class Parser(report_sxw.rml_parse):
         uid = self.uid
         context = {}
 
+        # ---------------------------------------------------------------------
+        #                           Work Book
+        # ---------------------------------------------------------------------
         # Output XLS log file:
         xls = '~/smb/production.xlsx'
         xls = os.path.expanduser(xls)
         WB = xlsxwriter.Workbook(xls)
+        
+        # ---------------------------------------------------------------------
+        #                           Work Sheet:
+        # ---------------------------------------------------------------------
+        # Rese:
         WS_mrp = WB.add_worksheet('Rese')
+        write_xls(WS_mrp, [
+            'Produzione',
+            'Anno',
+            'Periodo',
+            'Data',
+            'Prodotto',
+            'Teorica',
+            'Effettiva',
+            'Recupero',
+            'Anommalia',
+            ], 0) # write header
+        counter_mrp = 0 # Jump header line
+        
+        # Lavorazioni:
         WS = WB.add_worksheet('Lavorazioni')
         write_xls(WS, [
             'Linea',
@@ -87,6 +109,9 @@ class Parser(report_sxw.rml_parse):
             ], 0) # write header
         counter = 0 # Jump header line
         
+        # ---------------------------------------------------------------------
+        #                       Collect Statistic data:
+        # ---------------------------------------------------------------------        
         mrp_pool = self.pool.get('mrp.production')
 
         # Get data wizard selection:        
@@ -110,17 +135,25 @@ class Parser(report_sxw.rml_parse):
         mrp_ids = mrp_pool.search(cr, uid, domain, context=context)
         for mrp in mrp_pool.browse(cr, uid, mrp_ids, context=context):                
             product = mrp.product_id
+
+            # Check total:
+            mrp_in = 0.0 # MP input
+            mrp_out = 0.0 # PF output
+            mrp_recycle = 0.0 # Recycle
+            
             if product not in res:
                 # theoric, real, recycle
-                res[product] = [0.0, 0.0, 0.0]
+                res[product] = [0.0, 0.0, 0.0] 
 
             # Lavoration Theoric:
             wc_line = '?'
             for wc in mrp.workcenter_lines: # Lavoration
                 counter += 1
                 wc_line = wc.workcenter_id.name
+                # Total MP
                 material_qty = sum([m.quantity for m in wc.bom_material_ids])
                 res[product][0] += material_qty
+                mrp_in += material_qty
                     
                 # LOG XLS line:
                 date_ref = wc.real_date_planned or ''
@@ -141,9 +174,12 @@ class Parser(report_sxw.rml_parse):
             for cl in mrp.load_ids:
                 counter += 1
                 res[product][1] += cl.product_qty
+                mrp_out += cl.product_qty
+                
                 # Recycle error:
                 if cl.recycle:
                     res[product][2] += cl.product_qty
+                    mrp_recycle += cl.product_qty  
 
                 # LOG XLS line:
                 date_ref = cl.date or ''
@@ -159,7 +195,23 @@ class Parser(report_sxw.rml_parse):
                     cl.product_qty, # Q. real
                     cl.product_qty if cl.recycle else 0.0, # Recycle
                     ], counter)
-        
+            
+            # ----------------------------
+            # Write Work book for mrp data        
+            # ----------------------------
+            date_ref = mrp.date_planned
+            write_xls(WS, [
+                mrp.name, # 0. XXX Last line found previous loop 
+                date_ref[:4], # Year
+                date_ref[:7], # Period
+                date_ref, # Date
+                product.default_code, # Product
+                mrp_in, # Q. theoric
+                mrp_out, # Q. real
+                mrp_recycle, # Recycle
+                'X' if mrp_in < mrp_out,
+                ], counter)
+    
         # Sort order
         records = []
         for record in sorted(res, key=lambda x: x.default_code):
