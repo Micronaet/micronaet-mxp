@@ -75,6 +75,7 @@ class Parser(report_sxw.rml_parse):
         WS = WB.add_worksheet('Lavorazioni')
         write_xls(WS, [
             'Linea',
+            'Anno',
             'Periodo',
             'Data',
             'Prodotto',
@@ -125,6 +126,7 @@ class Parser(report_sxw.rml_parse):
                 date_ref = wc.real_date_planned or ''
                 write_xls(WS, [
                     wc_line, # Line
+                    date_ref[:4], # Year
                     date_ref[:7], # Period
                     date_ref, # Date
                     product.default_code, # Product
@@ -147,6 +149,7 @@ class Parser(report_sxw.rml_parse):
                 date_ref = cl.date or ''
                 write_xls(WS, [
                     wc_line, # 0. XXX Last line found previous loop 
+                    date_ref[:4], # Year
                     date_ref[:7], # Period
                     date_ref, # Date
                     product.default_code, # Product
