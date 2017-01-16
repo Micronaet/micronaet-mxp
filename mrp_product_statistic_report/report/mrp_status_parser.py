@@ -81,6 +81,7 @@ class Parser(report_sxw.rml_parse):
         # Rese:
         WS_mrp = WB.add_worksheet('Rese')
         write_xls(WS_mrp, [
+            'Linea',
             'Produzione',
             'Anno',
             'Periodo',
@@ -89,7 +90,7 @@ class Parser(report_sxw.rml_parse):
             'Teorica',
             'Effettiva',
             'Recupero',
-            'Anommalia',
+            'Anomalia',
             ], 0) # write header
         counter_mrp = 0 # Jump header line
         
@@ -197,11 +198,12 @@ class Parser(report_sxw.rml_parse):
                     cl.product_qty if cl.recycle else 0.0, # Recycle
                     ], counter)
             
-            # ----------------------------
+            # -----------------------------------------------------------------
             # Write Work book for mrp data        
-            # ----------------------------
+            # -----------------------------------------------------------------
             date_ref = mrp.date_planned
             write_xls(WS_mrp, [
+                wc_line,
                 mrp.name, # 0. XXX Last line found previous loop 
                 date_ref[:4], # Year
                 date_ref[:7], # Period
