@@ -55,12 +55,12 @@ class Parser(report_sxw.rml_parse):
         ''' Load data for product status report
         '''
         # Utility:
-        def write_xls(WS, row, line):
+        def write_xls(WS, row, counter):
             ''' Write line in XLS file (used also for header)
             '''
             col = 0
             for item in row:
-                WS.write(counter, col, line)
+                WS.write(counter, col, item)
                 col += 1
         
         cr = self.cr
@@ -69,19 +69,22 @@ class Parser(report_sxw.rml_parse):
 
         # Output XLS log file:
         xls = '~/smb/production.xlsx'
+        xls = os.path.expanduser(xls)
         WB = xlsxwriter.Workbook(xls)
         WS_mrp = WB.add_worksheet('Rese')
         WS = WB.add_worksheet('Lavorazioni')
         write_xls(WS, [
             'Linea',
-            'Prodotto',
-            'Produzione'
+            'Periodo',
             'Data',
+            'Prodotto',
+            'Produzione',
             'Documento',
-            'Quant.',
+            'Teorica',
+            'Effettiva',
             'Recupero',
             ], 0) # write header
-        counter = 1 # Jump header line
+        counter = 0 # Jump header line
         
         mrp_pool = self.pool.get('mrp.production')
 
@@ -101,27 +104,58 @@ class Parser(report_sxw.rml_parse):
             domain.append(('date_planned', '<=', to_date))
         if product_id:
             domain.append(('product_id', '=', product_id))
-        
+
+        res = {}        
         mrp_ids = mrp_pool.search(cr, uid, domain, context=context)
-        for mrp in mrp_pool.browse(cr, uid, mrp_ids, context=context):
+        for mrp in mrp_pool.browse(cr, uid, mrp_ids, context=context):                
             product = mrp.product_id
             if product not in res:
                 # theoric, real, recycle
                 res[product] = [0.0, 0.0, 0.0]
 
             # Lavoration Theoric:
+            wc_line = '?'
             for wc in mrp.workcenter_lines: # Lavoration
-                res[product][0] += \
-                    sum([m.quantity for m in wc.bom_material_ids])
-                # wc.product_qty # header not better!!!
+                counter += 1
+                wc_line = wc.workcenter_id.name
+                material_qty = sum([m.quantity for m in wc.bom_material_ids])
+                res[product][0] += material_qty
+                    
+                # LOG XLS line:
+                date_ref = wc.real_date_planned or ''
+                write_xls(WS, [
+                    wc_line, # Line
+                    date_ref[:7], # Period
+                    date_ref, # Date
+                    product.default_code, # Product
+                    mrp.name, # MRP
+                    wc.name, # Document
+                    material_qty, # 5. Q. theoric
+                    0.0, # 6. Q. real
+                    0.0, # 7. Recycle
+                    ], counter)
             
             # CL Real: 
             for cl in mrp.load_ids:
+                counter += 1
                 res[product][1] += cl.product_qty
                 # Recycle error:
                 if cl.recycle:
                     res[product][2] += cl.product_qty
-            
+
+                # LOG XLS line:
+                date_ref = cl.date or ''
+                write_xls(WS, [
+                    wc_line, # 0. XXX Last line found previous loop 
+                    date_ref[:7], # Period
+                    date_ref, # Date
+                    product.default_code, # Product
+                    mrp.name, # MRP
+                    'CL%s'  % cl.accounting_cl_code, # Document
+                    0.0, # Q. theoric
+                    cl.product_qty, # Q. real
+                    cl.product_qty if cl.recycle else 0.0, # Recycle
+                    ], counter)
         
         # Sort order
         records = []
