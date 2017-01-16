@@ -200,7 +200,7 @@ class Parser(report_sxw.rml_parse):
             # Write Work book for mrp data        
             # ----------------------------
             date_ref = mrp.date_planned
-            write_xls(WS, [
+            write_xls(WS_mrp, [
                 mrp.name, # 0. XXX Last line found previous loop 
                 date_ref[:4], # Year
                 date_ref[:7], # Period
@@ -209,8 +209,8 @@ class Parser(report_sxw.rml_parse):
                 mrp_in, # Q. theoric
                 mrp_out, # Q. real
                 mrp_recycle, # Recycle
-                'X' if mrp_in < mrp_out,
-                ], counter)
+                'X' if mrp_in < mrp_out else '',
+                ], counter_mrp)
     
         # Sort order
         records = []
