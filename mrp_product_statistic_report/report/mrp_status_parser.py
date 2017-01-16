@@ -24,6 +24,7 @@ import os
 import sys
 import logging
 import openerp
+import xlsxwriter # XLSX export
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.report import report_sxw
@@ -53,12 +54,35 @@ class Parser(report_sxw.rml_parse):
     def get_objects(self, data):
         ''' Load data for product status report
         '''
-        res = {}
+        # Utility:
+        def write_xls(WS, row, line):
+            ''' Write line in XLS file (used also for header)
+            '''
+            col = 0
+            for item in row:
+                WS.write(counter, col, line)
+                col += 1
         
         cr = self.cr
         uid = self.uid
         context = {}
 
+        # Output XLS log file:
+        xls = '~/smb/production.xlsx'
+        WB = xlsxwriter.Workbook(xls)
+        WS_mrp = WB.add_worksheet('Rese')
+        WS = WB.add_worksheet('Lavorazioni')
+        write_xls(WS, [
+            'Linea',
+            'Prodotto',
+            'Produzione'
+            'Data',
+            'Documento',
+            'Quant.',
+            'Recupero',
+            ], 0) # write header
+        counter = 1 # Jump header line
+        
         mrp_pool = self.pool.get('mrp.production')
 
         # Get data wizard selection:        
