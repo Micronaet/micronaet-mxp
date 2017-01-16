@@ -133,7 +133,8 @@ class Parser(report_sxw.rml_parse):
 
         res = {}        
         mrp_ids = mrp_pool.search(cr, uid, domain, context=context)
-        for mrp in mrp_pool.browse(cr, uid, mrp_ids, context=context):                
+        for mrp in mrp_pool.browse(cr, uid, mrp_ids, context=context):  
+            counter_mrp += 1              
             product = mrp.product_id
 
             # Check total:
