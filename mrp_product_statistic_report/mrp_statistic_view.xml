@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_stat_mrp_production_tree">
+            <field name="name">mrp.production.tree</field>
+            <field name="model">mrp.production</field>
+            <field name="priority" eval="50" />
+            <field name="arch" type="xml">
+                <tree fonts="bold:message_unread==True" colors="colors='blue:accounting_state in ('draft',);green:accounting_state in ('production',);red:accounting_state in ('cancel',);black:accounting_state in ('close',);" string="Ordini di produzione">
+	                <field name="message_unread" invisible="1" modifiers="{'readonly': true, 'tree_invisible': true}"/>
+	                <field name="stat_wc_id" />
+	                <field name="name" />
+	                <field name="date_planned" />
+	                <field name="product_id" />
+	                <field name="product_uom" />
+	                <field name="hour_total" sum="Total hours"/>
+	                <field name="cycle_total" sum="Total cycle" />
+	                <field name="stat_theoric" sum="Total theoric"/>
+	                <field name="stat_real" sum="Total real"/>
+	                <field name="stat_recycle" sum="Total recycle"/>
+	                <field name="state" invisible="1" />
+	                <field name="accounting_state" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_stat_mrp_production_graph">
+            <field name="name">mrp.productoin.graph</field>
+            <field name="model">mrp.production</field>
+            <field name="priority" eval="50" />
+            <field name="type">graph</field>
+            <field name="arch" type="xml">
+                <graph string="MRP production stat" type="bar/pie">
+                    <field name="stat_wc_id"/>
+                    <field name="stat_real" operator="+"/>
+                </graph>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_stat_mrp_production">
+            <field name="name">MRP statistic</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="view_id" ref="view_stat_mrp_production_tree"/>
+            <field name="context">{'graph_view_ref': 'mrp_product_statistic_report.view_stat_mrp_production_graph'}</field>
+            <field name="domain">[]</field>
+        </record>
+        <menuitem 
+            parent="production_line.menu_base_production_root_reporting" 
+            id="menu_stat_mrp_productio" 
+            action="action_stat_mrp_production"
+            />
+        
+    </data>
+</openerp>
+

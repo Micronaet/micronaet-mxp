@@ -43,6 +43,19 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
+class MrpProduction(orm.Model):
+    """ Model name: MrpProduction
+    """    
+    _inherit = 'mrp.production'
+    
+    _columns = {
+        'stat_theoric': fields.float('Theoric Qty', digits=(16, 3)),
+        'stat_real': fields.float('Real Qty', digits=(16, 3)),
+        'stat_recycle': fields.float('Recycle Qty', digits=(16, 3)),
+        'stat_wc_id': fields.many2one(
+            'mrp.workcenter', 'Line'),
+        }
+    
 
 class Parser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
@@ -51,7 +64,7 @@ class Parser(report_sxw.rml_parse):
             'get_objects': self.get_objects,
         })
     
-    def get_objects(self, data):
+    def get_objects(self, data, context=None):
         ''' Load data for product status report
         '''
         # Utility:
@@ -65,7 +78,9 @@ class Parser(report_sxw.rml_parse):
         
         cr = self.cr
         uid = self.uid
-        context = {}
+        if context is None:
+            context = {}
+        with_history = True # context.get('with_history') 
 
         # ---------------------------------------------------------------------
         #                           Work Book
@@ -126,7 +141,10 @@ class Parser(report_sxw.rml_parse):
         product_id = data.get('product_id', False)
 
         # Filter report:
-        domain = [('state', '!=', 'cancel')]
+        domain = [
+         #('state', '!=', 'cancel'),
+         ('accounting_state', '=', 'close'),
+         ]
         if from_date:
             domain.append(('date_planned', '>=', from_date))
         if to_date:
@@ -151,9 +169,12 @@ class Parser(report_sxw.rml_parse):
 
             # Lavoration Theoric:
             wc_line = '?'
+            wc_id = False
             for wc in mrp.workcenter_lines: # Lavoration
                 counter += 1
+                wc_id = wc.workcenter_id.id or False
                 wc_line = wc.workcenter_id.name
+                
                 # Total MP
                 material_qty = sum([m.quantity for m in wc.bom_material_ids])
                 res[product][0] += material_qty
@@ -218,6 +239,15 @@ class Parser(report_sxw.rml_parse):
                 mrp_recycle / mrp_in * 100.0 if mrp_in else 0.0, # TODO check!!
                 'X' if mrp_in < mrp_out else '',
                 ], counter_mrp)
+                
+            if with_history:
+                mrp_pool.write(cr, uid, mrp.id, {
+                    'stat_theoric': mrp_in,
+                    'stat_real': mrp_out,
+                    'stat_recycle': mrp_recycle,
+                    'stat_wc_id': wc_id,
+                    }, context=context)    
+                
     
         # Sort order
         records = []
