@@ -52,8 +52,7 @@ class MrpProduction(orm.Model):
         'stat_theoric': fields.float('Theoric Qty', digits=(16, 3)),
         'stat_real': fields.float('Real Qty', digits=(16, 3)),
         'stat_recycle': fields.float('Recycle Qty', digits=(16, 3)),
-        'stat_wc_id': fields.many2one(
-            'mrp.workcenter', 'Line'),
+        'stat_wc_id': fields.many2one('mrp.workcenter', 'Line'),
         }
     
 

@@ -1,6 +1,30 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+                    
+        <record model="ir.ui.view" id="view_stat_mrp_production_search">
+            <field name="name">mrp.production.search</field>
+            <field name="model">mrp.production</field>
+            <field name="priority" eval="50" />
+            <field name="arch" type="xml">
+                <search string="String" version="7.0">        
+                    <field name="name" />
+                    <field name="stat_wc_id" />
+                    <field name="product_id" />
+                    <field name="date_planned" string="Planned &gt;=" filter_domain="[('date_planned', '&gt;=', self)]" />
+                    <field name="date_planned" string="Planned &lt;=" filter_domain="[('date_planned', '&lt;=', self)]" />
+                    
+                    <!--<filter name="state_draft" string="Draft state" domain="[('state','=','draft')]"/>-->
+                    <group expand="0" string="Group By...">
+                        <filter string="Product" context="{'group_by': 'product_id'}"/>
+                        <filter string="Data" context="{'group_by': 'date_planned'}"/>
+                        <filter string="Line" context="{'group_by': 'stat_wc_id'}" />
+                        <!--<filter string="Account status" context="{'group_by': 'accounting_state'}" />
+                        <filter string="Status" context="{'group_by': 'state'}" />-->
+                    </group>                
+                </search>
+            </field>
+        </record>
         <record model="ir.ui.view" id="view_stat_mrp_production_tree">
             <field name="name">mrp.production.tree</field>
             <field name="model">mrp.production</field>
@@ -24,14 +48,15 @@
             </field>
         </record>
         <record model="ir.ui.view" id="view_stat_mrp_production_graph">
-            <field name="name">mrp.productoin.graph</field>
+            <field name="name">mrp.production.graph</field>
             <field name="model">mrp.production</field>
             <field name="priority" eval="50" />
             <field name="type">graph</field>
             <field name="arch" type="xml">
-                <graph string="MRP production stat" type="bar/pie">
+                <graph string="MRP production stat" type="bar">
                     <field name="stat_wc_id"/>
                     <field name="stat_real" operator="+"/>
+                    <!--<field name="stat_theoric" operator="+"/>-->
                 </graph>
             </field>
         </record>
@@ -41,6 +66,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
             <field name="view_id" ref="view_stat_mrp_production_tree"/>
+            <field name="search_view_id" ref="view_stat_mrp_production_search"/>            
             <field name="context">{'graph_view_ref': 'mrp_product_statistic_report.view_stat_mrp_production_graph'}</field>
             <field name="domain">[]</field>
         </record>
