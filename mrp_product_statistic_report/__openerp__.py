@@ -38,6 +38,9 @@
         'report/mrp_status_report.xml',
         'wizard/statistic_view.xml',
         'mrp_statistic_view.xml',
+        
+        # Scheduled procedure:
+        'scheduler.xml',
         ],
     'active': False,
     'installable': True,

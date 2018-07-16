@@ -47,23 +47,18 @@ class MrpProduction(orm.Model):
     """ Model name: MrpProduction
     """    
     _inherit = 'mrp.production'
-    
-    _columns = {
-        'stat_theoric': fields.float('Theoric Qty', digits=(16, 3)),
-        'stat_real': fields.float('Real Qty', digits=(16, 3)),
-        'stat_recycle': fields.float('Recycle Qty', digits=(16, 3)),
-        'stat_wc_id': fields.many2one('mrp.workcenter', 'Line'),
-        }
-    
 
-class Parser(report_sxw.rml_parse):
-    def __init__(self, cr, uid, name, context):
-        super(Parser, self).__init__(cr, uid, name, context)
-        self.localcontext.update({
-            'get_objects': self.get_objects,
-        })
-    
-    def get_objects(self, data, context=None):
+    def scheduled_get_statistic_report_objects(
+            self, cr, uid, data=None, context=None):
+        ''' Scheduled operation for upload data in production (used in stat.
+            views)
+        '''    
+        _logger.warning('Simulation report: generate statistic data')
+        self.get_statistic_report_objects(cr, uid, data=data, context=context)
+        _logger.warning('End simulation report: generate statistic data')
+        return True
+
+    def get_statistic_report_objects(self, cr, uid, data=None, context=None):
         ''' Load data for product status report
         '''
         # Utility:
@@ -75,8 +70,6 @@ class Parser(report_sxw.rml_parse):
                 WS.write(counter, col, item)
                 col += 1
         
-        cr = self.cr
-        uid = self.uid
         if context is None:
             context = {}
         with_history = True # context.get('with_history') 
@@ -95,42 +88,23 @@ class Parser(report_sxw.rml_parse):
         # Rese:
         WS_mrp = WB.add_worksheet('Rese')
         write_xls(WS_mrp, [
-            'Linea',
-            'Produzione',
-            'Anno',
-            'Periodo',
-            'Data',
-            'Prodotto',
-            'Teorica',
-            'Effettiva',
-            'Recupero',
-            'Resa Teo. / Eff.)',
-            'Recupero Rec. / Eff.)',
-            'Anomalia',
+            'Linea', 'Produzione', 'Anno', 'Periodo', 'Data', 'Prodotto',
+            'Teorica', 'Effettiva', 'Recupero', 'Resa Teo. / Eff.)',
+            'Recupero Rec. / Eff.)', 'Anomalia',
             ], 0) # write header
         counter_mrp = 0 # Jump header line
         
         # Lavorazioni:
         WS = WB.add_worksheet('Lavorazioni')
         write_xls(WS, [
-            'Linea',
-            'Anno',
-            'Periodo',
-            'Data',
-            'Prodotto',
-            'Produzione',
-            'Documento',
-            'Teorica',
-            'Effettiva',
-            'Recupero',
+            'Linea', 'Anno', 'Periodo', 'Data', 'Prodotto', 'Produzione',
+            'Documento', 'Teorica', 'Effettiva', 'Recupero',
             ], 0) # write header
         counter = 0 # Jump header line
         
         # ---------------------------------------------------------------------
         #                       Collect Statistic data:
         # ---------------------------------------------------------------------        
-        mrp_pool = self.pool.get('mrp.production')
-
         # Get data wizard selection:        
         if data is None:
             data = {}    
@@ -141,9 +115,9 @@ class Parser(report_sxw.rml_parse):
 
         # Filter report:
         domain = [
-         #('state', '!=', 'cancel'),
-         ('accounting_state', '=', 'close'),
-         ]
+             #('state', '!=', 'cancel'),
+             ('accounting_state', '=', 'close'),
+             ]
         if from_date:
             domain.append(('date_planned', '>=', from_date))
         if to_date:
@@ -152,8 +126,8 @@ class Parser(report_sxw.rml_parse):
             domain.append(('product_id', '=', product_id))
 
         res = {}        
-        mrp_ids = mrp_pool.search(cr, uid, domain, context=context)
-        for mrp in mrp_pool.browse(cr, uid, mrp_ids, context=context):  
+        mrp_ids = self.search(cr, uid, domain, context=context)
+        for mrp in self.browse(cr, uid, mrp_ids, context=context):  
             counter_mrp += 1              
             product = mrp.product_id
 
@@ -240,7 +214,7 @@ class Parser(report_sxw.rml_parse):
                 ], counter_mrp)
                 
             if with_history:
-                mrp_pool.write(cr, uid, mrp.id, {
+                self.write(cr, uid, mrp.id, {
                     'stat_theoric': mrp_in,
                     'stat_real': mrp_out,
                     'stat_recycle': mrp_recycle,
@@ -252,5 +226,26 @@ class Parser(report_sxw.rml_parse):
         records = []
         for record in sorted(res, key=lambda x: x.default_code):
             records.append((record, res[record]))
-        return records
+        return records    
+
+    _columns = {
+        'stat_theoric': fields.float('Theoric Qty', digits=(16, 3)),
+        'stat_real': fields.float('Real Qty', digits=(16, 3)),
+        'stat_recycle': fields.float('Recycle Qty', digits=(16, 3)),
+        'stat_wc_id': fields.many2one('mrp.workcenter', 'Line'),
+        }
+
+class Parser(report_sxw.rml_parse):
+    def __init__(self, cr, uid, name, context):
+        super(Parser, self).__init__(cr, uid, name, context)
+        self.localcontext.update({
+            'get_objects': self.get_objects,
+            })
+    
+    def get_objects(self, data=None, context=None):
+        ''' Load data for product status report
+        '''
+        return self.pool.get('mrp.production').get_statistic_report_objects(
+            self.cr, self.uid, data=data, context=context)
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
