@@ -144,6 +144,9 @@ class MrpProduction(orm.Model):
             wc_line = '?'
             wc_id = False
             for wc in mrp.workcenter_lines: # Lavoration
+                if wc.state == 'cancel': 
+                    continue
+
                 counter += 1
                 wc_id = wc.workcenter_id.id or False
                 wc_line = wc.workcenter_id.name
