@@ -128,7 +128,7 @@ class ProductProduct(orm.Model):
                         0.0, # 1. OF
                         0.0, # 2. OC
                         0.0, # 3. mat used in period (to be populate)
-                        material.minimum_qty or 0.0,  # 4. min level
+                        material.min_stock_level,  # 4. min level
                         material, # 5. save for reach data in report
                         [], # 6. detail OF
                         ]
