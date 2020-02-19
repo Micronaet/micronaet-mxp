@@ -43,6 +43,15 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
+class ProductProduct(orm.Model):
+    """ Model name: MrpProduction
+    """    
+    _inherit = 'product.product'
+    
+    _columns = {
+        'mrp_medium_yield': fields.float('Rendimento medio', digits=(16, 3)),
+        }
+
 class MrpProduction(orm.Model):
     """ Model name: MrpProduction
     """    
@@ -73,6 +82,7 @@ class MrpProduction(orm.Model):
         if context is None:
             context = {}
         with_history = True # context.get('with_history') 
+        product_pool = self.pool.get('product.product')
 
         # ---------------------------------------------------------------------
         #                           Work Book
@@ -223,13 +233,19 @@ class MrpProduction(orm.Model):
                     'stat_recycle': mrp_recycle,
                     'stat_wc_id': wc_id,
                     }, context=context)    
-                
     
         # Sort order
         records = []
         for record in sorted(res, key=lambda x: x.default_code):
-            records.append((record, res[record]))
-        return records    
+            data = res[record]
+            records.append((record, data))
+            # Product:
+            if with_history and data[0]:
+                mrp_medium_yield = 100.0 * data[1] / data[0]
+                product_pool.write(cr, uid, record.id, {
+                    'mrp_medium_yield': mrp_medium_yield,
+                    }, context=context)
+        return records
 
     _columns = {
         'stat_theoric': fields.float('Theoric Qty', digits=(16, 3)),
