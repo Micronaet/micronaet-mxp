@@ -299,8 +299,8 @@ class MrpProduction(orm.Model):
                  ' quindi va tolta per avere il netto effettivo prodotto'
                  ' per la vendita.',
         ),
-        'stat_recycle': fields.float(
-            'Q. fallata', digits=(16, 3),
+        'stat_real_net': fields.float(
+            'Q. reale netta', digits=(16, 3),
             help='Totale produzione netta usabile quindi togliendo il'
                  ' materiale uscito fallato e i recuperi / semilavorati'
                  ' riutilizzati nel processo produttivio'
