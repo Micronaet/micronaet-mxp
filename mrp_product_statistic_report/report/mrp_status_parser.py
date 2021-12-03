@@ -165,10 +165,10 @@ class MrpProduction(orm.Model):
 
                 # Total MP
                 material_qty = reused_qty = 0.0
-                pdb.set_trace()
                 for move in wc.bom_material_ids:
                     material_qty += move.quantity
-                    first_char = (move.product_id.default_code or '').upper()
+                    first_char = (
+                        move.product_id.default_code or '')[0].upper()
                     if first_char and first_char not in 'AB':
                         reused_qty += move.quantity
 
