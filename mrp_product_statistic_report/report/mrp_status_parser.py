@@ -280,39 +280,39 @@ class MrpProduction(orm.Model):
         'stat_theoric': fields.float(
             'Q. nominale', digits=(16, 3),
             help='Q. indicata sulla distinta di produzione, è il totale'
-                 'teorico per il quale si sta facendo la produzione (può'
-                 'capitare che nel processo produttivo vengano aggiunte poi '
-                 'dei recuperi extra che portano a produrre più di quello '
-                 'pianificato. Se è minore è richiesto una correzione sulla'
-                 'testata della produzione.',
+                 ' teorico per il quale si sta facendo la produzione (può'
+                 ' capitare che nel processo produttivo vengano aggiunte poi'
+                 ' dei recuperi extra che portano a produrre più di quello'
+                 ' pianificato. Se è minore è richiesto una correzione sulla'
+                 ' testata della produzione.',
         ),
         'stat_real': fields.float(
             'Q. reale', digits=(16, 3),
             help='E\' la quantità effettivamente uscita dalla produzione'
-                 'comprendente anceh il calo di lavorazione, di solito'
-                 'è minore uguale al valore nominale e dipende da quanta'
-                 'acqua si perde nel processo.'),
+                 ' comprendente anceh il calo di lavorazione, di solito'
+                 ' è minore uguale al valore nominale e dipende da quanta'
+                 ' acqua si perde nel processo.'),
         'stat_reused': fields.float(
             'Q. riusata', digits=(16, 3),
             help='Indica quanti prodotti sono stati reintrodotto nel processo'
-                 'produttivo come semilavorati quindi la produzione effettiva'
-                 'dovrà tenere conto che questi materiali non sono stati'
-                 'venduti ma riutilizzati'),
+                 ' produttivo come semilavorati quindi la produzione effettiva'
+                 ' dovrà tenere conto che questi materiali non sono stati'
+                 ' venduti ma riutilizzati'),
         'stat_recycle': fields.float(
             'Q. fallata', digits=(16, 3),
             help='E\' la quantità di prodotto che è uscita non corretta quindi'
-                 'non è vendibile, sarà riutilizzata nel processo produttivo'
-                 'e non venduta direttamente. Il totale reale la comprende'
-                 'quindi va tolta per avere il netto effettivo prodotto '
-                 'per la vendita.',
+                 ' non è vendibile, sarà riutilizzata nel processo produttivo'
+                 ' e non venduta direttamente. Il totale reale la comprende'
+                 ' quindi va tolta per avere il netto effettivo prodotto'
+                 ' per la vendita.',
         ),
         'stat_real_net': fields.function(
             _get_real_net, method=True,
             type='float', string='Reale netto',
-            help='Totale produzione netta usabile quindi togliendo il '
-                 'materiale uscito fallato e i recuperi / semilavorati '
-                 'riutilizzati nel processo produttivio '
-                 'Q. reale - Q. riusata - Q. fallata',
+            help='Totale produzione netta usabile quindi togliendo il'
+                 ' materiale uscito fallato e i recuperi / semilavorati'
+                 ' riutilizzati nel processo produttivio'
+                 ' Q. reale - Q. riusata - Q. fallata',
             store=False),
 
         'stat_wc_id': fields.many2one(
