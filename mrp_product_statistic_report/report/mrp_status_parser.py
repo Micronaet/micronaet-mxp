@@ -307,7 +307,7 @@ class MrpProduction(orm.Model):
                  'per la vendita.',
         ),
         'stat_real_net': fields.function(
-            '_get_real_net', method=True,
+            _get_real_net, method=True,
             type='float', string='Reale netto',
             help='Totale produzione netta usabile quindi togliendo il '
                  'materiale uscito fallato e i recuperi / semilavorati '
