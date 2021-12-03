@@ -252,7 +252,8 @@ class MrpProduction(orm.Model):
                     'stat_recycle': mrp_recycle,
                     'stat_reused': mrp_reused,
                     'stat_wc_id': wc_id,
-                    }, context=context)
+                    'stat_real_net': mrp_out - mrp_reused - mrp_recycle
+                }, context=context)
 
         # Sort order
         records = []
@@ -267,14 +268,6 @@ class MrpProduction(orm.Model):
                     'mrp_medium_yield': mrp_medium_yield,
                     }, context=context)
         return records
-
-    def _get_real_net(self, cr, uid, ids, fields, args, context=None):
-        """ Fields function for calculate
-        """
-        res = {}
-        for mrp in self.browse(cr, uid, ids, context=context):
-            res[mrp.id] = mrp.stat_real - mrp.stat_reused - mrp.stat_recycle
-        return res
 
     _columns = {
         'stat_theoric': fields.float(
@@ -306,14 +299,13 @@ class MrpProduction(orm.Model):
                  ' quindi va tolta per avere il netto effettivo prodotto'
                  ' per la vendita.',
         ),
-        'stat_real_net': fields.function(
-            _get_real_net, method=True,
-            type='float', string='Reale netto',
+        'stat_recycle': fields.float(
+            'Q. fallata', digits=(16, 3),
             help='Totale produzione netta usabile quindi togliendo il'
                  ' materiale uscito fallato e i recuperi / semilavorati'
                  ' riutilizzati nel processo produttivio'
                  ' Q. reale - Q. riusata - Q. fallata',
-            store=False),
+            ),
 
         'stat_wc_id': fields.many2one(
             'mrp.workcenter', 'Linea'),
