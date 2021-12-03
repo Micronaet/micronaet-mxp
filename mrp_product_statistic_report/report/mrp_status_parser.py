@@ -21,6 +21,7 @@
 ###############################################################################
 
 import os
+import pdb
 import sys
 import logging
 import openerp
@@ -83,7 +84,7 @@ class MrpProduction(orm.Model):
 
         if context is None:
             context = {}
-        with_history = True # context.get('with_history')
+        with_history = True  # context.get('with_history')
         product_pool = self.pool.get('product.product')
 
         # ---------------------------------------------------------------------
@@ -164,6 +165,7 @@ class MrpProduction(orm.Model):
 
                 # Total MP
                 material_qty = reused_qty = 0.0
+                pdb.set_trace()
                 for move in wc.bom_material_ids:
                     material_qty += move.quantity
                     first_char = (move.product_id.default_code or '').upper()
@@ -220,7 +222,7 @@ class MrpProduction(orm.Model):
                     0.0,  # Q. theoric
                     cl.product_qty,  # Q. real
                     cl.product_qty if cl.recycle else 0.0,  # Recycle
-                    0.0,  #  todo Reused needed?
+                    0.0,  # todo Reused needed?
                     ], counter)
 
             # -----------------------------------------------------------------
@@ -257,6 +259,7 @@ class MrpProduction(orm.Model):
         for record in sorted(res, key=lambda x: x.default_code):
             data = res[record]
             records.append((record, data))
+
             # Product:
             if with_history and data[0]:
                 mrp_medium_yield = 100.0 * data[1] / data[0]
@@ -291,7 +294,9 @@ class MrpProduction(orm.Model):
             'Q. fallata', digits=(16, 3),
             help='E\' la quantità di prodotto che è uscita non corretta quindi'
                  'non è vendibile, sarà riutilizzata nel processo produttivo'
-                 'e non venduta direttamente',   # todo indicare se è compresa
+                 'e non venduta direttamente. Il totale reale la comprende'
+                 'quindi va tolta per avere il netto effettivo prodotto '
+                 'per la vendita.',
         ),
         'stat_wc_id': fields.many2one(
             'mrp.workcenter', 'Linea'),
