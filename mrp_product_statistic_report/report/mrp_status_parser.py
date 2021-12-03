@@ -268,6 +268,14 @@ class MrpProduction(orm.Model):
                     }, context=context)
         return records
 
+    def _get_real_net(self, cr, uid, ids, fields, args, context=None):
+        """ Fields function for calculate
+        """
+        res = {}
+        for mrp in self.browse(cr, uid, ids, context=context):
+            res[mrp.id] = mrp.stat_real - mrp.stat_reused - mrp.stat_recycle
+        return res
+
     _columns = {
         'stat_theoric': fields.float(
             'Q. nominale', digits=(16, 3),
@@ -298,6 +306,15 @@ class MrpProduction(orm.Model):
                  'quindi va tolta per avere il netto effettivo prodotto '
                  'per la vendita.',
         ),
+        'stat_real_net': fields.function(
+            '_get_real_net', method=True,
+            type='float', string='Reale netto',
+            help='Totale produzione netta usabile quindi togliendo il '
+                 'materiale uscito fallato e i recuperi / semilavorati '
+                 'riutilizzati nel processo produttivio '
+                 'Q. reale - Q. riusata - Q. fallata',
+            store=False),
+
         'stat_wc_id': fields.many2one(
             'mrp.workcenter', 'Linea'),
         }

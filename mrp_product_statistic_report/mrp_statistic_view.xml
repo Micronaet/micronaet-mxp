@@ -37,12 +37,13 @@
 	                <field name="date_planned" />
 	                <field name="product_id" />
 	                <field name="product_uom" />
-	                <field name="hour_total" sum="Total hours"/>
-	                <field name="cycle_total" sum="Total cycle" />
-	                <field name="stat_theoric" sum="Total theoric"/>
-	                <field name="stat_real" sum="Total real"/>
-	                <field name="stat_recycle" sum="Total recycle"/>
-	                <field name="stat_reused" sum="Total reused"/>
+	                <field name="hour_total" sum="H. Totale ore"/>
+	                <field name="cycle_total" sum="C. Totale cicli" />
+	                <field name="stat_theoric" sum="N. Totale nominale"/>
+	                <field name="stat_real" sum="E. Totale effettiva"/>
+	                <field name="stat_recycle" sum="F. Totale fallati "/>
+	                <field name="stat_reused" sum="R. Totale riusi (Rec. o Prod.)"/>
+	                <field name="stat_real_net" sum="E-F-R. Produzione netta"/>
 	                <field name="state" invisible="1" />
 	                <field name="accounting_state" />
                 </tree>
