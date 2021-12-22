@@ -138,11 +138,16 @@ class MrpProduction(orm.Model):
         if product_id:
             domain.append(('product_id', '=', product_id))
 
+        detail_move = {
+            'reused': [],
+        }
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
             counter_mrp += 1
             product = mrp.product_id
+            product_code = product.default_code or ''
+            mrp_name = mrp.name
 
             # Check total:
             # Raw, final product, recycle, reused total:
@@ -161,16 +166,25 @@ class MrpProduction(orm.Model):
 
                 counter += 1
                 wc_id = wc.workcenter_id.id or False
+                wc_name = wc.name
                 wc_line = wc.workcenter_id.name
 
                 # Total MP
                 material_qty = reused_qty = 0.0
                 for move in wc.bom_material_ids:
                     material_qty += move.quantity
-                    first_char = (
-                        move.product_id.default_code or '')[0].upper()
+                    material_code = move.product_id.default_code or ''
+                    first_char = (material_code)[0].upper()
                     if first_char and first_char not in 'AB':
                         reused_qty += move.quantity
+                        detail_move['reused'].append([
+                            mrp_name,
+                            product_code,
+                            wc_name,
+                            wc_line,
+                            material_code,
+                            move.quantity,
+                        ])
 
                 # material_qty = sum([m.quantity for m in wc.bom_material_ids])
                 # Partial:
@@ -254,6 +268,15 @@ class MrpProduction(orm.Model):
                     'stat_wc_id': wc_id,
                     'stat_real_net': mrp_out - mrp_reused - mrp_recycle
                 }, context=context)
+
+        # Write statistic for check:
+        reused_f = open('/tmp/reused.csv', 'w')
+        for line in detail_move['reused']:
+            reused_f.write(
+                '%s|%s|%s|%s|%s|%s\n' % line
+            )
+            # mrp_name, product_code, wc_name, wc_line, material_code,
+            # move.quantity
 
         # Sort order
         records = []
