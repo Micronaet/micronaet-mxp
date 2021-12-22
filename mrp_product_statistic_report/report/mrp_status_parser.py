@@ -175,7 +175,7 @@ class MrpProduction(orm.Model):
                     material_qty += move.quantity
                     material_code = move.product_id.default_code or ''
                     first_char = (material_code)[0].upper()
-                    if first_char and first_char not in 'AB':
+                    if first_char and first_char not in 'ABV':
                         reused_qty += move.quantity
                         detail_move['reused'].append((
                             mrp_name,
