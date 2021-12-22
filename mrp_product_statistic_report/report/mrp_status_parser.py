@@ -143,7 +143,6 @@ class MrpProduction(orm.Model):
         }
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
-        pdb.set_trace()
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
             counter_mrp += 1
             product = mrp.product_id
@@ -178,14 +177,14 @@ class MrpProduction(orm.Model):
                     first_char = (material_code)[0].upper()
                     if first_char and first_char not in 'AB':
                         reused_qty += move.quantity
-                        detail_move['reused'].append([
+                        detail_move['reused'].append((
                             mrp_name,
                             product_code,
                             wc_name,
                             wc_line,
                             material_code,
                             move.quantity,
-                        ])
+                        ))
 
                 # material_qty = sum([m.quantity for m in wc.bom_material_ids])
                 # Partial:
@@ -271,7 +270,6 @@ class MrpProduction(orm.Model):
                 }, context=context)
 
         # Write statistic for check:
-        pdb.set_trace()
         reused_f = open('/tmp/reused.csv', 'w')
         for line in detail_move['reused']:
             reused_f.write(
