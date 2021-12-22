@@ -143,6 +143,7 @@ class MrpProduction(orm.Model):
         }
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
+        pdb.set_trace()
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
             counter_mrp += 1
             product = mrp.product_id
@@ -277,6 +278,7 @@ class MrpProduction(orm.Model):
             )
             # mrp_name, product_code, wc_name, wc_line, material_code,
             # move.quantity
+        reused_f.close()
 
         # Sort order
         records = []
