@@ -271,6 +271,7 @@ class MrpProduction(orm.Model):
                 }, context=context)
 
         # Write statistic for check:
+        pdb.set_trace()
         reused_f = open('/tmp/reused.csv', 'w')
         for line in detail_move['reused']:
             reused_f.write(
