@@ -165,6 +165,7 @@ class MrpProduction(orm.Model):
                     continue
 
                 counter += 1
+                date_ref = wc.real_date_planned or ''
                 wc_id = wc.workcenter_id.id or False
                 wc_name = wc.name
                 wc_line = wc.workcenter_id.name
@@ -178,6 +179,7 @@ class MrpProduction(orm.Model):
                     if first_char and first_char not in 'ABV':
                         reused_qty += move.quantity
                         detail_move['reused'].append((
+                            date_ref,
                             mrp_name,
                             product_code,
                             wc_name,
@@ -196,7 +198,6 @@ class MrpProduction(orm.Model):
                 mrp_reused += reused_qty
 
                 # LOG XLS line:
-                date_ref = wc.real_date_planned or ''
                 write_xls(WS, [
                     wc_line,  # Line
                     date_ref[:4],  # Year
@@ -273,7 +274,7 @@ class MrpProduction(orm.Model):
         reused_f = open('/tmp/reused.csv', 'w')
         for line in detail_move['reused']:
             reused_f.write(
-                '%s|%s|%s|%s|%s|%s\n' % line
+                '%s|%s|%s|%s|%s|%s|%s\n' % line
             )
             # mrp_name, product_code, wc_name, wc_line, material_code,
             # move.quantity
