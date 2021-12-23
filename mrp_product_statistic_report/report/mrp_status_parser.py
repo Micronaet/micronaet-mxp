@@ -145,7 +145,7 @@ class MrpProduction(orm.Model):
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
-            mrp_for_clean = any([l.recycle for l in mrp.load_ids])
+            mrp_for_clean = all([l.recycle for l in mrp.load_ids])
             counter_mrp += 1
             product = mrp.product_id
             product_code = product.default_code or ''
