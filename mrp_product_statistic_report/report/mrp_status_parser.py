@@ -145,7 +145,8 @@ class MrpProduction(orm.Model):
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
-            mrp_for_clean = all([l.recycle for l in mrp.load_ids])
+            mrp_for_clean = mrp.load_ids and all(
+                [l.recycle for l in mrp.load_ids])
             counter_mrp += 1
             product = mrp.product_id
             product_code = product.default_code or ''
@@ -187,7 +188,7 @@ class MrpProduction(orm.Model):
                     # Reused parse:
                     # ---------------------------------------------------------
                     material_code = move.product_id.default_code or ''
-                    first_char = (material_code)[0].upper()
+                    first_char = material_code[0].upper()
                     reused_mode = ''
                     if mrp_for_clean:  # all job goes in reused clean!
                         reused_mode = 'pulizia'
