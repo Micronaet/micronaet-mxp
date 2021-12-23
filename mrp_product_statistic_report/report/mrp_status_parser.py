@@ -111,7 +111,8 @@ class MrpProduction(orm.Model):
         WS = WB.add_worksheet('Lavorazioni')
         write_xls(WS, [
             'Linea', 'Anno', 'Periodo', 'Data', 'Prodotto', 'Produzione',
-            'Documento', 'Teorica', 'Effettiva', 'Recupero', 'Riutilizzo',
+            'Documento', 'Teorica', 'Effettiva', 'Recupero',
+            'Riuso recuperi', 'Riuso pulizia', 'Riuso inutilizzati',
             ], 0)  # write header
         counter = 0  # Jump header line
 
@@ -144,6 +145,7 @@ class MrpProduction(orm.Model):
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
+            mrp_for_clean = any([l.recycle for l in mrp.load_ids])
             counter_mrp += 1
             product = mrp.product_id
             product_code = product.default_code or ''
@@ -151,11 +153,16 @@ class MrpProduction(orm.Model):
 
             # Check total:
             # Raw, final product, recycle, reused total:
-            mrp_in = mrp_out = mrp_recycle = mrp_reused = 0.0
+            mrp_in = mrp_out = mrp_recycle = 0.0
+            mrp_w_reused = mrp_c_reused = mrp_p_reused = 0
 
             if product not in res:
-                # theoric, real, recycle, reused
-                res[product] = [0.0, 0.0, 0.0, 0.0]
+                res[product] = [
+                    # theoric, real, recycle,
+                    0.0, 0.0, 0.0,
+                    # reused: waste, clean, unused
+                    0.0, 0.0, 0.0
+                ]
 
             # Job Theoric:
             wc_line = '?'
@@ -170,14 +177,33 @@ class MrpProduction(orm.Model):
                 wc_name = wc.name
                 wc_line = wc.workcenter_id.name
 
-                # Total MP
-                material_qty = reused_qty = 0.0
+                # Total material prime (MP)
+                material_qty = reused_w_qty = reused_c_qty = reused_p_qty = 0.0
                 for move in wc.bom_material_ids:
-                    material_qty += move.quantity
+                    move_qty = move.quantity
+                    material_qty += move_qty  # all used goes in total material
+
+                    # ---------------------------------------------------------
+                    # Reused parse:
+                    # ---------------------------------------------------------
                     material_code = move.product_id.default_code or ''
                     first_char = (material_code)[0].upper()
-                    if first_char and first_char not in 'ABV':
-                        reused_qty += move.quantity
+                    reused_mode = ''
+                    if mrp_for_clean:  # all job goes in reused clean!
+                        reused_mode = 'pulizia'
+                        reused_c_qty += move_qty
+                        # mrp_reused['clean'] += reused_c_qty
+
+                    elif first_char == 'R':  # reused waste product:
+                        reused_mode = 'recupero'
+                        reused_w_qty += move_qty
+                        # mrp_reused['waste'] += reused_w_qty
+
+                    elif first_char and first_char not in 'ABVR':
+                        reused_mode = 'invenduti'
+                        reused_p_qty += move_qty
+
+                    if reused_mode:  # for log:
                         detail_move['reused'].append((
                             date_ref,
                             mrp_name,
@@ -185,19 +211,29 @@ class MrpProduction(orm.Model):
                             wc_name,
                             wc_line,
                             material_code,
-                            move.quantity,
+                            move_qty,
+                            reused_mode,
                         ))
 
-                # material_qty = sum([m.quantity for m in wc.bom_material_ids])
-                # Partial:
+                # -------------------------------------------------------------
+                # Total for product statistics:
+                # -------------------------------------------------------------
                 res[product][0] += material_qty
-                res[product][3] += reused_qty
+                res[product][3] += reused_w_qty
+                res[product][4] += reused_c_qty
+                res[product][5] += reused_p_qty
 
-                # Total:
+                # -------------------------------------------------------------
+                # Total for MRP (once ad the end o WC loop):
+                # -------------------------------------------------------------
                 mrp_in += material_qty
-                mrp_reused += reused_qty
+                mrp_w_reused += reused_w_qty
+                mrp_c_reused += reused_c_qty
+                mrp_p_reused += reused_p_qty
 
+                # -------------------------------------------------------------
                 # LOG XLS line:
+                # -------------------------------------------------------------
                 write_xls(WS, [
                     wc_line,  # Line
                     date_ref[:4],  # Year
@@ -206,10 +242,12 @@ class MrpProduction(orm.Model):
                     product.default_code,  # Product
                     mrp.name,  # MRP
                     wc.name,  # Document
-                    material_qty,  # 5. Q. theoric
-                    0.0,  # 6. Q. real
-                    0.0,  # 7. Recycle
-                    0.0,  # 8. Reused
+                    material_qty,  # Q. theoric
+                    0.0,  # Q. real
+                    0.0,  # Recycle
+                    0.0,  # todo Reused waste
+                    0.0,  # todo Reused clean
+                    0.0,  # todo Reused product
                     ], counter)
 
             # CL Real:
@@ -237,7 +275,10 @@ class MrpProduction(orm.Model):
                     0.0,  # Q. theoric
                     cl.product_qty,  # Q. real
                     cl.product_qty if cl.recycle else 0.0,  # Recycle
-                    0.0,  # todo Reused needed?
+                    # todo reused needed?
+                    0.0,  # todo Reused waste
+                    0.0,  # todo Reused clean
+                    0.0,  # todo Reused product
                     ], counter)
 
             # -----------------------------------------------------------------
@@ -254,7 +295,10 @@ class MrpProduction(orm.Model):
                 mrp_in,  # Q. theoric
                 mrp_out,  # Q. real
                 mrp_recycle,  # Recycle
-                mrp_reused,  # Reused product
+                mrp_w_reused,  # Reused waste
+                mrp_c_reused,  # Reused clean
+                mrp_p_reused,  # Reused product
+
                 mrp_out / mrp_in * 100.0 if mrp_in else 0.0,
                 mrp_recycle / mrp_in * 100.0 if mrp_in else 0.0,  # todo check!
                 'X' if mrp_in < mrp_out else '',
@@ -265,16 +309,20 @@ class MrpProduction(orm.Model):
                     'stat_theoric': mrp_in,
                     'stat_real': mrp_out,
                     'stat_recycle': mrp_recycle,
-                    'stat_reused': mrp_reused,
+                    'stat_reused_waste': mrp_w_reused,
+                    'stat_reused_clean': mrp_c_reused,
+                    'stat_reused_unused': mrp_p_reused,
                     'stat_wc_id': wc_id,
-                    'stat_real_net': mrp_out - mrp_reused - mrp_recycle
+                    'stat_real_net': (  # todo all removed?
+                        mrp_out - mrp_w_reused - mrp_c_reused -
+                        mrp_p_reused - mrp_recycle),
                 }, context=context)
 
         # Write statistic for check:
         reused_f = open('/tmp/reused.csv', 'w')
         for line in detail_move['reused']:
             reused_f.write(
-                '%s|%s|%s|%s|%s|%s|%s\n' % line
+                '%s|%s|%s|%s|%s|%s|%s|%s\n' % line
             )
             # mrp_name, product_code, wc_name, wc_line, material_code,
             # move.quantity
@@ -310,12 +358,27 @@ class MrpProduction(orm.Model):
                  ' comprendente anceh il calo di lavorazione, di solito'
                  ' è minore uguale al valore nominale e dipende da quanta'
                  ' acqua si perde nel processo.'),
-        'stat_reused': fields.float(
-            'Q. riusata', digits=(16, 3),
-            help='Indica quanti prodotti sono stati reintrodotto nel processo'
+        'stat_reused_waste': fields.float(
+            'Riuso (recupero)', digits=(16, 3),
+            help='Indica quanti prodotti di recupero (generati da lavorazioni'
+                 ' margate come fallate) sono stati reintrodotti nel processo'
                  ' produttivo come semilavorati quindi la produzione effettiva'
                  ' dovrà tenere conto che questi materiali non sono stati'
                  ' venduti ma riutilizzati'),
+        'stat_reused_clean': fields.float(
+            'Riuso (pulizia)', digits=(16, 3),
+            help='Indica quanti prodotti scaturidi da lavorazioni di pulizia'
+                 ' sono stati reintrodotti nel processo'
+                 ' produttivo come semilavorati quindi la produzione effettiva'
+                 ' dovrà tenere conto che questi materiali sono stati'
+                 ' riutilizzati'),
+        'stat_reused_unused': fields.float(
+            'Riuso (invenduti)', digits=(16, 3),
+            help='Indica quanti prodotti invenduti (prodotto buono) '
+                 'sono stati reintrodotti nel processo produttivo come '
+                 'semilavorati quindi la produzione effettiva '
+                 'dovrà tenere conto che questi materiali non sono stati '
+                 'venduti ma riutilizzati '),
         'stat_recycle': fields.float(
             'Q. fallata', digits=(16, 3),
             help='E\' la quantità di prodotto che è uscita non corretta quindi'
