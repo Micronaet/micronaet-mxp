@@ -190,7 +190,10 @@ class MrpProduction(orm.Model):
                     material_code = move.product_id.default_code or ''
                     first_char = material_code[0].upper()
                     reused_mode = ''
-                    if mrp_for_clean:  # all job goes in reused clean!
+                    if material_code == 'ORIC':
+                        _logger.warning('ORIC not used')
+
+                    elif mrp_for_clean:  # all job goes in reused clean!
                         reused_mode = 'pulizia'
                         reused_c_qty += move_qty
                         # mrp_reused['clean'] += reused_c_qty
