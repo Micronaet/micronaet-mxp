@@ -48,7 +48,8 @@
 	                <field name="stat_reused_waste" sum="totale recuperi" string="[R] Riusi (Rec.)"/>
 	                <field name="stat_reused_clean" sum="totale pulizia" string="[P] Riusi (Pulizia)"/>
 	                <field name="stat_reused_unused" sum="totale invenduti" string="[I] Riusi (Invenduti)"/>
-	                <field name="stat_real_net" sum="totale netto" string="[E-F-R-P-I] Produzione netta"/>
+	                <field name="stat_reused_semiproduct" sum="totale semilavorati" string="[S] Riusi (semil.)"/>
+	                <field name="stat_real_net" sum="totale netto" string="[E-F-R-P-I-S] Produzione netta"/>
 	                <field name="state" invisible="1" />
 	                <field name="accounting_state" />
                 </tree>

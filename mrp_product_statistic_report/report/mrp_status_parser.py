@@ -52,6 +52,12 @@ class ProductProduct(orm.Model):
 
     _columns = {
         'mrp_medium_yield': fields.float('Rendimento medio', digits=(16, 3)),
+        'semi_product': fields.boolean(
+            'Semilavorato',
+            help='Indica che il prodotto è spesso utlizzato o creato per '
+                 'essere reimmesso nel processo produttivo. Questa indicazione'
+                 'serve solamente ai fini statistici per avere due totali'
+                 'differenti tra semilavorati e prodotti non venduti')
         }
 
 
@@ -153,19 +159,20 @@ class MrpProduction(orm.Model):
             counter_mrp += 1
             product = mrp.product_id
             product_code = product.default_code or ''
+            semi_product = product.semi_product
             mrp_name = mrp.name
 
             # Check total:
             # Raw, final product, recycle, reused total:
             mrp_in = mrp_out = mrp_recycle = 0.0
-            mrp_w_reused = mrp_c_reused = mrp_p_reused = 0
+            mrp_w_reused = mrp_c_reused = mrp_p_reused = mrp_s_reused = 0
 
             if product not in res:
                 res[product] = [
                     # theoric, real, recycle,
                     0.0, 0.0, 0.0,
-                    # reused: waste, clean, unused
-                    0.0, 0.0, 0.0
+                    # reused: waste, clean, unsold, semiproduct
+                    0.0, 0.0, 0.0, 0.0,
                 ]
 
             # Job Theoric:
@@ -182,7 +189,8 @@ class MrpProduction(orm.Model):
                 wc_line = wc.workcenter_id.name
 
                 # Total material prime (MP)
-                material_qty = reused_w_qty = reused_c_qty = reused_p_qty = 0.0
+                material_qty = reused_w_qty = reused_c_qty = reused_p_qty = \
+                    reused_s_qty = 0.0
                 for move in wc.bom_material_ids:
                     move_qty = move.quantity
                     material_qty += move_qty  # all used goes in total material
@@ -195,6 +203,10 @@ class MrpProduction(orm.Model):
                     reused_mode = ''
                     if material_code == 'ORIC':
                         _logger.warning('ORIC not used')
+
+                    elif semi_product:
+                        reused_mode = 'semilavorato'
+                        reused_s_qty += move_qty
 
                     elif mrp_for_clean:  # all job goes in reused clean!
                         reused_mode = 'pulizia'
@@ -229,6 +241,7 @@ class MrpProduction(orm.Model):
                 res[product][3] += reused_w_qty
                 res[product][4] += reused_c_qty
                 res[product][5] += reused_p_qty
+                res[product][6] += reused_s_qty
 
                 # -------------------------------------------------------------
                 # Total for MRP (once ad the end o WC loop):
@@ -237,6 +250,7 @@ class MrpProduction(orm.Model):
                 mrp_w_reused += reused_w_qty
                 mrp_c_reused += reused_c_qty
                 mrp_p_reused += reused_p_qty
+                mrp_s_reused += reused_s_qty
 
                 # -------------------------------------------------------------
                 # LOG XLS line:
@@ -255,6 +269,7 @@ class MrpProduction(orm.Model):
                     0.0,  # todo Reused waste
                     0.0,  # todo Reused clean
                     0.0,  # todo Reused product
+                    0.0,  # todo Reused semiproduct
                     ], counter)
 
             # CL Real:
@@ -286,6 +301,7 @@ class MrpProduction(orm.Model):
                     0.0,  # todo Reused waste
                     0.0,  # todo Reused clean
                     0.0,  # todo Reused product
+                    0.0,  # todo Reused semiproduct
                     ], counter)
 
             # -----------------------------------------------------------------
@@ -305,6 +321,7 @@ class MrpProduction(orm.Model):
                 mrp_w_reused,  # Reused waste
                 mrp_c_reused,  # Reused clean
                 mrp_p_reused,  # Reused product
+                mrp_s_reused,  # Reused semiproduct
 
                 mrp_out / mrp_in * 100.0 if mrp_in else 0.0,
                 mrp_recycle / mrp_in * 100.0 if mrp_in else 0.0,  # todo check!
@@ -319,10 +336,11 @@ class MrpProduction(orm.Model):
                     'stat_reused_waste': mrp_w_reused,
                     'stat_reused_clean': mrp_c_reused,
                     'stat_reused_unused': mrp_p_reused,
+                    'stat_reused_semiproduct': mrp_s_reused,
                     'stat_wc_id': wc_id,
                     'stat_real_net': (  # todo all removed?
                         mrp_out - mrp_w_reused - mrp_c_reused -
-                        mrp_p_reused - mrp_recycle),
+                        mrp_p_reused - mrp_s_reused - mrp_recycle),
                 }, context=context)
 
         # Write statistic for check:
@@ -385,7 +403,14 @@ class MrpProduction(orm.Model):
                  'sono stati reintrodotti nel processo produttivo come '
                  'semilavorati quindi la produzione effettiva '
                  'dovrà tenere conto che questi materiali non sono stati '
-                 'venduti ma riutilizzati '),
+                 'venduti ma riutilizzati.'),
+        'stat_reused_semiproduct': fields.float(
+            'Riuso (semilavorato)', digits=(16, 3),
+            help='Indica quanti prodotti semilavorati prodotto fatto per '
+                 'riuso) sono stati reintrodotti nel processo produttivo come '
+                 'semilavorati quindi la produzione effettiva '
+                 'dovrà tenere conto che questi materiali non sono stati '
+                 'venduti ma riutilizzati.'),
         'stat_recycle': fields.float(
             'Q. fallata', digits=(16, 3),
             help='E\' la quantità di prodotto che è uscita non corretta quindi'
