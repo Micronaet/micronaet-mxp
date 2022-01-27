@@ -197,9 +197,10 @@ class MrpProduction(orm.Model):
                     # ---------------------------------------------------------
                     # Reused parse:
                     # ---------------------------------------------------------
-                    semi_product = move.product_id.semi_product
+                    material = move.product_id
+                    semi_product = material.semi_product
 
-                    material_code = move.product_id.default_code or ''
+                    material_code = material.default_code or ''
                     first_char = material_code[0].upper()
                     reused_mode = ''
                     if material_code == 'ORIC':
