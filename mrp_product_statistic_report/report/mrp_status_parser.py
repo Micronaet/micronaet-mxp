@@ -147,6 +147,13 @@ class MrpProduction(orm.Model):
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
             mrp_for_clean = mrp.load_ids and all(
                 [l.recycle for l in mrp.load_ids])
+
+            # Remove and change selection:
+            if mrp_for_clean:
+                self.write(cr, uid, [mrp.id], {
+                    'mrp_for_clean': True,
+                }, context=context)
+
             counter_mrp += 1
             product = mrp.product_id
             product_code = product.default_code or ''
