@@ -1,6 +1,36 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <record id="product_normal_semiproduct_form_view" model="ir.ui.view">
+            <field name="name">Semilavorati</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="semi_product" />
+                </xpath>
+            </field>
+        </record>
+        <record id="product_normal_semiproduct_tree_view" model="ir.ui.view">
+            <field name="name">Semilavorati</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="semi_product" />
+                </xpath>
+            </field>
+        </record>
+        <record id="product_normal_semiproduct_search_view" model="ir.ui.view">
+            <field name="name">Semilavorati</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_search_form_view"/>
+            <field name="arch" type="xml">
+                <filter name="filter_to_sell" position="before">
+                    <filter string="Semilavorato" name="filter_semiproduct" domain="[('semi_product','=',True)]"/>
+                </filter>
+            </field>
+        </record>
 
         <record model="ir.ui.view" id="view_stat_mrp_production_search">
             <field name="name">mrp.production.search</field>
