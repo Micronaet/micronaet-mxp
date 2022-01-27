@@ -216,13 +216,13 @@ class MrpProduction(orm.Model):
                         reused_w_qty += move_qty
                         # mrp_reused['waste'] += reused_w_qty
 
-                    elif first_char and first_char not in 'ABVR':
-                        reused_mode = 'invenduti'
-                        reused_p_qty += move_qty
-
                     elif semi_product:
                         reused_mode = 'semilavorato'
                         reused_s_qty += move_qty
+
+                    elif first_char and first_char not in 'ABVR':
+                        reused_mode = 'invenduti'
+                        reused_p_qty += move_qty
 
                     if reused_mode:  # for log:
                         detail_move['reused'].append((
