@@ -204,10 +204,6 @@ class MrpProduction(orm.Model):
                     if material_code == 'ORIC':
                         _logger.warning('ORIC not used')
 
-                    elif semi_product:
-                        reused_mode = 'semilavorato'
-                        reused_s_qty += move_qty
-
                     elif mrp_for_clean:  # all job goes in reused clean!
                         reused_mode = 'pulizia'
                         reused_c_qty += move_qty
@@ -221,6 +217,10 @@ class MrpProduction(orm.Model):
                     elif first_char and first_char not in 'ABVR':
                         reused_mode = 'invenduti'
                         reused_p_qty += move_qty
+
+                    elif semi_product:
+                        reused_mode = 'semilavorato'
+                        reused_s_qty += move_qty
 
                     if reused_mode:  # for log:
                         detail_move['reused'].append((
