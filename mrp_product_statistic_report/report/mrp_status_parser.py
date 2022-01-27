@@ -145,14 +145,10 @@ class MrpProduction(orm.Model):
         res = {}
         mrp_ids = self.search(cr, uid, domain, context=context)
         for mrp in self.browse(cr, uid, mrp_ids, context=context):
-            mrp_for_clean = mrp.load_ids and all(
-                [l.recycle for l in mrp.load_ids])
-
-            # Remove and change selection:
-            if mrp_for_clean:
-                self.write(cr, uid, [mrp.id], {
-                    'mrp_for_clean': True,
-                }, context=context)
+            # Old way:
+            # mrp_for_clean = mrp.load_ids and all(
+            #    [l.recycle for l in mrp.load_ids])
+            mrp_for_clean = mrp.mrp_for_clean
 
             counter_mrp += 1
             product = mrp.product_id
