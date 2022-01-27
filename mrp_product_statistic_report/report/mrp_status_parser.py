@@ -159,7 +159,6 @@ class MrpProduction(orm.Model):
             counter_mrp += 1
             product = mrp.product_id
             product_code = product.default_code or ''
-            semi_product = product.semi_product
             mrp_name = mrp.name
 
             # Check total:
@@ -198,6 +197,8 @@ class MrpProduction(orm.Model):
                     # ---------------------------------------------------------
                     # Reused parse:
                     # ---------------------------------------------------------
+                    semi_product = move.product_id.semi_product
+
                     material_code = move.product_id.default_code or ''
                     first_char = material_code[0].upper()
                     reused_mode = ''
@@ -266,10 +267,10 @@ class MrpProduction(orm.Model):
                     material_qty,  # Q. theoric
                     0.0,  # Q. real
                     0.0,  # Recycle
-                    0.0,  # todo Reused waste
-                    0.0,  # todo Reused clean
-                    0.0,  # todo Reused product
-                    0.0,  # todo Reused semiproduct
+                    0.0,  # Reused waste
+                    0.0,  # Reused clean
+                    0.0,  # Reused product
+                    0.0,  # Reused semiproduct
                     ], counter)
 
             # CL Real:
@@ -297,11 +298,12 @@ class MrpProduction(orm.Model):
                     0.0,  # Q. theoric
                     cl.product_qty,  # Q. real
                     cl.product_qty if cl.recycle else 0.0,  # Recycle
-                    # todo reused needed?
-                    0.0,  # todo Reused waste
-                    0.0,  # todo Reused clean
-                    0.0,  # todo Reused product
-                    0.0,  # todo Reused semiproduct
+
+                    # Reused:
+                    0.0,  # Reused waste
+                    0.0,  # Reused clean
+                    0.0,  # Reused product
+                    0.0,  # Reused semiproduct
                     ], counter)
 
             # -----------------------------------------------------------------
