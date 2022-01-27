@@ -14,11 +14,14 @@
                     <field name="date_planned" string="Planned &gt;=" filter_domain="[('date_planned', '&gt;=', self)]" />
                     <field name="date_planned" string="Planned &lt;=" filter_domain="[('date_planned', '&lt;=', self)]" />
 
+                    <filter name="mrp_for_clean" string="Di pulizia" domain="[('mrp_for_clean','=',True)]" />
+
                     <!--<filter name="state_draft" string="Draft state" domain="[('state','=','draft')]"/>-->
                     <group expand="0" string="Group By...">
                         <filter string="Product" context="{'group_by': 'product_id'}"/>
                         <filter string="Data" context="{'group_by': 'date_planned'}"/>
                         <filter string="Line" context="{'group_by': 'stat_wc_id'}" />
+                        <filter string="Pulizia" context="{'group_by': 'mrp_for_clean'}" />
                         <!--<filter string="Account status" context="{'group_by': 'accounting_state'}" />
                         <filter string="Status" context="{'group_by': 'state'}" />-->
                     </group>
