@@ -21,8 +21,8 @@
                 </field>
             </field>
         </record>
-        
-        
+
+
         <record model="ir.ui.view" id="view_account_position_link_form">
             <field name="name">account.fiscal.position.link.form</field>
             <field name="model">account.fiscal.position</field>
@@ -31,6 +31,7 @@
                 <field name="active" position="after">
                     <field name="cei_ref" />
                     <field name="esention_ref" />
+                    <field name="force_account_tax_id" />
                 </field>
             </field>
         </record>
@@ -42,6 +43,7 @@
                 <field name="name" position="after">
                     <field name="cei_ref" />
                     <field name="esention_ref" />
+                    <field name="force_account_tax_id" />
                 </field>
             </field>
         </record>

@@ -30,19 +30,20 @@ from openerp import SUPERUSER_ID
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
-from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT, 
-    DEFAULT_SERVER_DATETIME_FORMAT, 
-    DATETIME_FORMATS_MAP, 
+from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
+    DEFAULT_SERVER_DATETIME_FORMAT,
+    DATETIME_FORMATS_MAP,
     float_compare)
 
 
 _logger = logging.getLogger(__name__)
 
+
 class AccountTax(orm.Model):
     """ Model name: AccountTax
     """
     _inherit = 'account.tax'
-    
+
     _columns = {
         'account_ref': fields.char('Account Ref.', size=10),
         }
@@ -52,9 +53,9 @@ class AccountFiscalPosition(orm.Model):
     """ Model name: AccountTax
     """
     _inherit = 'account.fiscal.position'
-    
+
     _columns = {
         'cei_ref': fields.char('CEI Ref.', size=1),
         'esention_ref': fields.char('Esention ref', size=5),
-        }        
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        'force_account_tax_id': fields.many2one('account.tax', 'Forza IVA'),
+        }
