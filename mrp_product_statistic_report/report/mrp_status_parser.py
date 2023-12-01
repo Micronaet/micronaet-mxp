@@ -386,6 +386,12 @@ class MrpProduction(orm.Model):
                         mrp_p_reused - mrp_s_reused - mrp_recycle),
                 }, context=context)
 
+        # Close WB:
+        try:
+            WB.close()
+        except:
+            _logger.error('Error closing WB: %s' % (sys.exc_info(), ))
+
         # Write statistic for check:
         reused_f = open('/tmp/reused.csv', 'w')
         for line in detail_move['reused']:
