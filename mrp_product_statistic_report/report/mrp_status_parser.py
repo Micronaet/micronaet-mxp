@@ -415,7 +415,7 @@ class MrpProduction(orm.Model):
             # Product:
             if with_history and data[0]:
                 mrp_medium_yield = 100.0 * data[1] / data[0]
-                stat_medium_period = 100.0 * data[7] / setup_stat_medium_period
+                stat_medium_period = data[7] / setup_stat_medium_period
 
                 product_pool.write(cr, uid, record.id, {
                     'mrp_medium_yield': mrp_medium_yield,
