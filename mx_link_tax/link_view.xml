@@ -22,7 +22,6 @@
             </field>
         </record>
 
-
         <record model="ir.ui.view" id="view_account_position_link_form">
             <field name="name">account.fiscal.position.link.form</field>
             <field name="model">account.fiscal.position</field>

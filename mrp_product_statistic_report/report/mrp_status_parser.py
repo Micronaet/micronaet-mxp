@@ -45,12 +45,36 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 _logger = logging.getLogger(__name__)
 
 
+class ResCompany(orm.Model):
+    """ Model name: MrpProduction
+    """
+    _inherit = 'res.company'
+
+    _columns = {
+        'setup_stat_medium_period': fields.integer(
+            'GG. m(x) MRP prod.',
+            help='Giorni da considerare per fare il calcolo medio delle '
+                 'produzioni per prodotto (partendo dalle CL del periodo)')
+    }
+
+    _defaults = {
+        'setup_stat_medium_period': lambda *x: 180,
+    }
+
+
 class ProductProduct(orm.Model):
     """ Model name: MrpProduction
     """
     _inherit = 'product.product'
 
     _columns = {
+        'stat_medium_period': fields.float(
+            'M(x) MRP del periodo', digits=(16, 3),
+            help='E\' la quantità media del periodo selezionato nei parametri'
+                 '(abitualmente 180 gg) calcolata prendendo tutti i carichi'
+                 'di produzione per prodotto e facendo la media giornaliera. ',
+        ),
+
         'mrp_medium_yield': fields.float('Rendimento medio', digits=(16, 3)),
         'semi_product': fields.boolean(
             'Semilavorato',
@@ -92,6 +116,16 @@ class MrpProduction(orm.Model):
             context = {}
         with_history = True  # context.get('with_history')
         product_pool = self.pool.get('product.product')
+        user_pool = self.pool.get('res.users')
+
+        # Setup range for product medium:
+        user = user_pool.browse(cr, uid, uid, context=context)
+        company = user.company_id
+        setup_stat_medium_period = company.setup_stat_medium_period or 180
+        now = datetime.now()
+        from_dt = now - timedelta(days=setup_stat_medium_period)
+        from_date = from_dt.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        _logger.warning('Medium MRP product periodo from %s' % from_date)
 
         # ---------------------------------------------------------------------
         #                           Work Book
@@ -172,6 +206,9 @@ class MrpProduction(orm.Model):
                     0.0, 0.0, 0.0,
                     # reused: waste, clean, unsold, semiproduct
                     0.0, 0.0, 0.0, 0.0,
+
+                    # Medium MRP for product,
+                    0.0,  # Total KG produced (after calc medium)
                 ]
 
             # Job Theoric:
@@ -288,6 +325,9 @@ class MrpProduction(orm.Model):
 
                 # LOG XLS line:
                 date_ref = cl.date or ''
+                if date_ref and date_ref > from_date:
+                    res[product][0] += cl.product_qty
+
                 write_xls(WS, [
                     wc_line,  # 0. XXX Last line found previous loop
                     date_ref[:4],  # Year
@@ -365,8 +405,11 @@ class MrpProduction(orm.Model):
             # Product:
             if with_history and data[0]:
                 mrp_medium_yield = 100.0 * data[1] / data[0]
+                stat_medium_period = 100.0 * data[7] / setup_stat_medium_period
+
                 product_pool.write(cr, uid, record.id, {
                     'mrp_medium_yield': mrp_medium_yield,
+                    'stat_medium_period': stat_medium_period,
                     }, context=context)
         return records
 
