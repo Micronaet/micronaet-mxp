@@ -396,6 +396,7 @@ class MrpProduction(orm.Model):
 
         # Write statistic for check:
         reused_f = open('/tmp/reused.csv', 'w')
+        _logger.warning('Write log file')
         for line in detail_move['reused']:
             reused_f.write(
                 '%s|%s|%s|%s|%s|%s|%s|%s\n' % line
@@ -406,7 +407,7 @@ class MrpProduction(orm.Model):
 
         # Sort order
         records = []
-        pdb.set_trace()
+        _logger.warning('Write medium in product')
         for record in sorted(res, key=lambda x: x.default_code):
             data = res[record]
             records.append((record, data))
