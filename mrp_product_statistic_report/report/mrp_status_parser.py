@@ -325,8 +325,10 @@ class MrpProduction(orm.Model):
 
                 # LOG XLS line:
                 date_ref = cl.date or ''
-                if date_ref and date_ref > from_date:
-                    res[product][0] += cl.product_qty
+
+                # MRP Product total CL for m(x):
+                if date_ref and date_ref >= from_date:  # Only in range period
+                    res[product][7] += cl.product_qty
 
                 write_xls(WS, [
                     wc_line,  # 0. XXX Last line found previous loop
@@ -404,6 +406,7 @@ class MrpProduction(orm.Model):
 
         # Sort order
         records = []
+        pdb.set_trace()
         for record in sorted(res, key=lambda x: x.default_code):
             data = res[record]
             records.append((record, data))
