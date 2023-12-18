@@ -30,34 +30,35 @@ from openerp import SUPERUSER_ID
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
-from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT, 
-    DEFAULT_SERVER_DATETIME_FORMAT, 
-    DATETIME_FORMATS_MAP, 
+from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
+    DEFAULT_SERVER_DATETIME_FORMAT,
+    DATETIME_FORMATS_MAP,
     float_compare)
 
 
 _logger = logging.getLogger(__name__)
 
+
 class MrpBomDerived(osv.osv):
-    ''' Add extra field to manage mrp.bom
-    ''' 
+    """ Add extra field to manage mrp.bom
+    """
     _inherit = 'mrp.bom'
-    
+
     # --------------
     # Button events:
     # --------------
     def load_from_parent(self, cr, uid, ids, context=None):
-        ''' Load from parent
-        '''
+        """ Load from parent
+        """
         assert len(ids), 'Run only with one BOM!'
-        
+
         # ---------------------
         # Remove current lines:
         # ---------------------
-        bom_proxy = self.browse(cr, uid, ids, context=context)[0]                
+        bom_proxy = self.browse(cr, uid, ids, context=context)[0]
         unlink_ids = [item.id for item in bom_proxy.bom_lines]
         self.unlink(cr, uid, unlink_ids, context=context)
-        
+
         # ---------------------------------
         # Create line from parent elements:
         # ---------------------------------
@@ -68,25 +69,22 @@ class MrpBomDerived(osv.osv):
                 'product_uom': line.product_uom.id,
                 'product_qty': line.product_qty,
                 'date_start': line.date_start,
-                'date_stop': line.date_stop,                
-                }, context=context)                
+                'date_stop': line.date_stop,
+                }, context=context)
         return True
-             
+
     _columns = {
         'from_bom_id': fields.many2one(
-            'mrp.bom', 'From BOM', domain=[('bom_id', '=', False)]), 
+            'mrp.bom', 'From BOM', domain=[('bom_id', '=', False)]),
         }
 
+
 class MrpBomDerived(osv.osv):
-    ''' Add extra field to manage mrp.bom
-    ''' 
+    """ Add extra field to manage mrp.bom
+    """
     _inherit = 'mrp.bom'
 
     _columns = {
         'derived_ids': fields.one2many(
             'mrp.bom', 'from_bom_id', 'Derived BOM'),
         }
-    
-    
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

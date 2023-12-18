@@ -54,7 +54,8 @@ class ResCompany(orm.Model):
         'setup_stat_medium_period': fields.integer(
             'GG. m(x) MRP prod.',
             help='Giorni da considerare per fare il calcolo medio delle '
-                 'produzioni per prodotto (partendo dalle CL del periodo)')
+                 'produzioni per prodotto (partendo dalle CL del periodo)'
+                 'Utilizzato anche per vedere le medie di vendita da DDT')
     }
 
     _defaults = {
@@ -68,6 +69,12 @@ class ProductProduct(orm.Model):
     _inherit = 'product.product'
 
     _columns = {
+        'stat_medium_ddt_period': fields.float(
+            'M(x) DDT del periodo', digits=(16, 3),
+            help='E\' la quantità media del periodo selezionato nei parametri'
+                 '(abitualmente 180 gg) calcolata prendendo tutti gli scarichi'
+                 ' per DDT e facendo la media giornaliera.',
+        ),
         'stat_medium_period': fields.float(
             'M(x) MRP del periodo', digits=(16, 3),
             help='E\' la quantità media del periodo selezionato nei parametri'
@@ -126,6 +133,30 @@ class MrpProduction(orm.Model):
         from_dt = now - timedelta(days=setup_stat_medium_period)
         from_date = from_dt.strftime(DEFAULT_SERVER_DATE_FORMAT)
         _logger.warning('Medium MRP product periodo from %s' % from_date)
+
+        # ---------------------------------------------------------------------
+        # Update DDT sell statistics:
+        # ---------------------------------------------------------------------
+        ddt_pool = self.pool.get('stock.ddt')
+        ddt_ids = ddt_pool.search(cr, uid, [
+            ('state', '=', 'done'),
+            ('date', '>=', from_date),
+        ], context=context)
+        ddt_data = {}
+        for ddt in ddt_pool.browse(cr, uid, ddt_ids, context=context):
+            for line in ddt.line_ids:
+                product_id = line.product_id.id
+                quantity = line.product_uom_qty
+                if product_id not in ddt_data:
+                    ddt_data[product_id] = 0.0
+                ddt_data[product_id] += quantity
+        pdb.set_trace()
+        for product_id in ddt_data:
+            stat_medium_ddt_period = \
+                ddt_data[product_id] / setup_stat_medium_period
+            product_pool.write(cr, uid, [product_id], {
+                'stat_medium_ddt_period': stat_medium_ddt_period,
+            }, context=context)
 
         # ---------------------------------------------------------------------
         #                           Work Book
@@ -326,7 +357,7 @@ class MrpProduction(orm.Model):
                 # LOG XLS line:
                 date_ref = cl.date or ''
 
-                # MRP Product total CL for m(x):
+                # >> MRP Product total CL for m(x):
                 if date_ref and date_ref >= from_date:  # Only in range period
                     res[product][7] += cl.product_qty
 

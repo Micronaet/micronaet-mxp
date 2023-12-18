@@ -31,6 +31,7 @@
         'base',
         'mrp',
         'production_line',
+        'sapnaet',  # For updating statistics from DDT
         ],
     'init_xml': [],
     'demo': [],
@@ -38,7 +39,7 @@
         'report/mrp_status_report.xml',
         'wizard/statistic_view.xml',
         'mrp_statistic_view.xml',
-        
+
         # Scheduled procedure:
         'scheduler.xml',
         ],
