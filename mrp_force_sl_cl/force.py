@@ -30,39 +30,40 @@ from openerp import SUPERUSER_ID
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
-from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT, 
-    DEFAULT_SERVER_DATETIME_FORMAT, 
-    DATETIME_FORMATS_MAP, 
+from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
+    DEFAULT_SERVER_DATETIME_FORMAT,
+    DATETIME_FORMATS_MAP,
     float_compare)
 
 
 _logger = logging.getLogger(__name__)
 
+
 class MrpProductionWorkcenterLine(orm.Model):
     """ Model name: MrpProductionWorkcenterLine
-    """    
-    
+    """
+
     _inherit = 'mrp.production.workcenter.line'
 
-    # --------------    
+    # --------------
     # Button events:
-    # --------------    
+    # --------------
     def button_re_send_SL_document(self, cr, uid, ids, context=None):
-        ''' Button for re sent SL document (save file and launch XMLRPC
+        """ Button for re send SL document (save file and launch XMLRPC
             procedure)
-        '''
+        """
         # Pool used:
         mrp_pool = self.pool.get('mrp.production')
-        
+
         # Read parameters:
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
         lavoration_browse = self.browse(cr, uid, ids, context=context)[0]
         file_cl, file_cl_upd, file_sl = mrp_pool.get_interchange_files(
             cr, uid, parameter, context=context)
 
-        # Exrport SL files (without correct stock status)
+        # Export SL files (without correct stock status)
         mrp_pool.create_unload_file(
-            cr, uid, file_sl, lavoration_browse, force_stock=False, 
+            cr, uid, file_sl, lavoration_browse, force_stock=False,
             context=context)
 
         # XMLRPC server:
@@ -71,9 +72,9 @@ class MrpProductionWorkcenterLine(orm.Model):
 
         if parameter.production_demo:
             raise osv.except_osv(
-            _('Import SL error!'),
-            _('XMLRPC not launched: DEMO Mode!'), 
-            )
+                _('Import SL error!'),
+                _('XMLRPC not launched: DEMO Mode!'),
+                )
         else:
             # ---------------------------------------------------------
             #               SL for material and package
@@ -85,46 +86,48 @@ class MrpProductionWorkcenterLine(orm.Model):
                         _('Different SL document!'),
                         _('Current SL: %s Accounting: %s') % (
                             lavoration_browse.accounting_sl_code,
-                            accounting_sl_code,                            
+                            accounting_sl_code,
                             ),
-                        )                    
-                _logger.warning('SL creation esit: %s' % accounting_sl_code)                
-            except:    
+                        )
+                _logger.warning('SL creation esit: %s' % accounting_sl_code)
+            except:
                 raise osv.except_osv(
                     _('Import SL error!'),
-                    _('XMLRPC error calling import SL procedure'), )                
+                    _('XMLRPC error calling import SL procedure'),
+                )
 
-            # TODO in future used for resend normally with recreation SL code:
-            #lavoration_pool.write(
+            # todo in future used for resend normally with recreation SL code:
+            # lavoration_pool.write(
             #    cr, uid, [current_lavoration_id], {
             #        'accounting_sl_code': accounting_sl_code,
-            #        'unload_confirmed': True, 
-            #        # TODO non dovrebbe più servire 
+            #        'unload_confirmed': True,
+            #        # TODO non dovrebbe più servire
             #        # Next 'confirm' is for prod.
             #        },
             #    context=context)
         return True
 
+
 class MrpProductionWorkcenterLoad(orm.Model):
     """ Model name: MrpProductionWorkcenterLoad
-    """    
-    
+    """
+
     _inherit = 'mrp.production.workcenter.load'
 
-    # --------------    
+    # --------------
     # Button events:
-    # --------------    
+    # --------------
     def button_re_send_CL_no_SL_document(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-            
-        context['import_only_CL'] = True        
+
+        context['import_only_CL'] = True
         return self.button_re_send_CL_document(cr, uid, ids, context=context)
-                
+
     def button_re_send_CL_document(self, cr, uid, ids, context=None):
-        ''' Button for re sent CL document (save file and launch XMLRPC
+        """ Button for re sent CL document (save file and launch XMLRPC
             procedure)
-        '''
+        """
         if context is None:
             context = {}
 
@@ -134,10 +137,10 @@ class MrpProductionWorkcenterLoad(orm.Model):
         import_only_CL = context.get('import_only_CL', False)
         if import_only_CL:
             _logger.warning('Import only CL')
-        else:    
-            _logger.warning('Import CL and SL for materials')            
-            
-        
+        else:
+            _logger.warning('Import CL and SL for materials')
+
+
         # Read parameters:
         parameter = mrp_pool.get_sl_cl_parameter(cr, uid, context=context)
         load_browse = self.browse(cr, uid, ids, context=context)[0]
@@ -150,7 +153,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
 
         # ---------------------------------------------------------------------
         #                            Export CL file:
-        # ---------------------------------------------------------------------        
+        # ---------------------------------------------------------------------
         # Read data from saved lavoration
         product_qty = load_browse.product_qty
         #line_id = load_browse.line_id.id
@@ -168,19 +171,19 @@ class MrpProductionWorkcenterLoad(orm.Model):
         product_code = load_browse.product_code
         accounting_cost = load_browse.accounting_cost # price calculated!
         price = accounting_cost / product_qty
-        accounting_cl_code = load_browse.accounting_cl_code      
+        accounting_cl_code = load_browse.accounting_cl_code
         cl_date = '%s%s%s' % (
             load_browse.date[:4],
             load_browse.date[5:7],
             load_browse.date[8:10],
             )
-                
+
         #if not price:
         #    raise osv.except_osv(
         #        _('Price error!'),
         #        _('Price is empty, problem with lavoration non closed!'),
         #        )
-        
+
         # Open transit file:
         try:
             f_cl = open(file_cl, 'w')
@@ -189,7 +192,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 _('Transit file problem accessing!'),
                 _('%s (maybe open in accounting program)!') % file_cl,
                 )
-        
+
         if wrong:
             f_cl.write('%-35s%10.2f%13.5f%8s%8s\r\n' % (
                 '%sR%s' % (
@@ -199,12 +202,12 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 product_qty,
                 price,
                 accounting_cl_code,
-                cl_date,               
+                cl_date,
                 ))
         else:
             f_cl.write('%-35s%10.2f%13.5f%8s%8s\r\n' % (
-                product_code, 
-                product_qty, 
+                product_code,
+                product_qty,
                 price,
                 accounting_cl_code,
                 cl_date,
@@ -222,7 +225,7 @@ class MrpProductionWorkcenterLoad(orm.Model):
                 ))
         else:
             pass # TODO raise error if no package? (no if wrong!)
-            
+
         if not import_only_CL and pallet and pallet_qty: # XXX after was pallet
             f_cl.write(
                 '%-10s%-25s%10.2f%-13s%16s\r\n' % ( # TODO 10 extra space
@@ -233,13 +236,13 @@ class MrpProductionWorkcenterLoad(orm.Model):
                     '',
                 ))
         else:
-            pass                
+            pass
         f_cl.close()
 
         if parameter.production_demo:
             raise osv.except_osv(
             _('Import CL error!'),
-            _('XMLRPC not launched: DEMO Mode!'), 
+            _('XMLRPC not launched: DEMO Mode!'),
             )
             return
 
@@ -253,16 +256,16 @@ class MrpProductionWorkcenterLoad(orm.Model):
                     _('Different CL document!'),
                     _('Current CL: %s Accounting: %s') % (
                         load_browse.accounting_cl_code,
-                        accounting_cl_code,                            
+                        accounting_cl_code,
                         ),
-                    )                    
+                    )
             _logger.warning('CL creation esit: %s' % accounting_cl_code)
-        except:    
+        except:
             raise osv.except_osv(
                 _('Import CL error!'),
                 _('XMLRPC error calling import CL procedure %s') % (
-                    sys.exc_info(), ), 
-                )                
-        return True    
-    
+                    sys.exc_info(), ),
+                )
+        return True
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
